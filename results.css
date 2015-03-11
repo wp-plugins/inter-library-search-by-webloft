@@ -1,0 +1,89 @@
+.reglitre_results_header {
+	font-family: tahoma, sans-serif;
+	color: #000;
+	width: 100%;
+	display: table;
+	}
+
+.reglitre_results table {
+	width: 100%;
+	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+	font-weight: 300;
+	color: #333;
+	font-size: 12px;
+	margin-top: 10px;
+	}
+
+.reglitre_results h3 {
+	margin-bottom: 2px;
+	}
+
+.reglitre_results h3>a {
+	color: maroon;
+	text-decoration: none;
+	}
+
+.opphav {
+	font-style: italic;
+	color: #888;
+	}
+
+img.omslag {
+	max-width: 80px;
+	height: auto;
+	margin: 5px;
+	}
+
+.materialtype {
+	font-size: 0.8em;
+	text-transform: uppercase;
+	font-weight: bold;
+	}
+
+img.materialtype {
+	width: 30px;
+	height: auto;
+	}
+
+td.row-0 {
+	background-color: #ffe;
+	padding: 3px;
+	}
+
+td.row-1 {
+	background-color: #eff;
+	padding: 3px;
+	}
+
+.viser_tekst {
+	display: table-cell;
+	vertical-align: middle;
+	text-align: left;
+}
+
+.paginering {
+	color: #fff;
+	text-align: right;
+	display: table-cell;
+	vertical-align: middle;
+	}
+
+.tilgang_boks {
+	width: 90%;
+	margin: 0 auto;
+	margin-top: 10px;
+	font-weight: bold;
+	padding: 4px 5%;
+}
+
+.tilgang_groenn {
+	background-color: #01FF70;
+	}
+
+.tilgang_orange {
+	background-color: #FFDC00;
+	}
+
+.tilgang_roed {
+	background-color: #FF4136;
+	}
