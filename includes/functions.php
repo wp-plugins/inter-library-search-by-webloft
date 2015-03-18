@@ -46,7 +46,7 @@ function trunc($phrase, $max_words) {
 // Failsafe function to read file
 
 function get_content($url) { // Les inn en fil
-
+//echo "<h1>get_content: " . $url . "</h1>";
 	$ch = curl_init();  
      
 	curl_setopt ($ch, CURLOPT_URL, $url);  

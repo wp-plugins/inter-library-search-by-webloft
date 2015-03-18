@@ -2,3 +2,33 @@
 	height: 0;
 }
 
+.reglitre_skjema {
+	font-family: muli, arial, sans-serif;
+	font-size: 1.2em;
+	color: #333;
+	font-weight: 300;
+	letter-spacing: 1px;
+	}
+
+.reglitre_skjema input {
+	font-family: muli, arial, sans-serif;
+	font-size: 0.8em;
+	color: #000;
+	font-weight: 400;
+	letter-spacing: 1px;
+	border: none;
+	background: #ddd;
+	border-radius: 10px;
+	height: 15px;
+	padding: 8px;
+	}
+
+.reglitre_skjema input[type=submit] {
+	color: #000;
+	height: 30px;
+	font-family: muli, arial, sans-serif;
+	font-size: 0.8em;
+	font-weight: 400;
+	letter-spacing: -1px;
+	padding: 0px 5px;
+	}

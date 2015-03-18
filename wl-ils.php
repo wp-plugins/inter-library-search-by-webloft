@@ -3,7 +3,7 @@
 Plugin Name: ILS Search by Webloft
 Plugin URI: http://www.sundaune.no/
 Description: Interlibrary search for your Wordpress site! NORWEGIAN: Setter inn s&oslash;kefelt som lar deg s&oslash;ke i mange forskjellige bibliotekssystemer.
-Version: 1.0
+Version: 1.1
 Author: H&aring;kon Sundaune
 Author URI: http://www.sundaune.no/
 */
@@ -56,7 +56,8 @@ if ($hamedsok != '') {
 
 $out = "<div class=\"reglitre_skjema\">\n";
 $out .= "<form onSubmit=\"showreglitreLoading();\" id=\"webloftform\" target=\"reglitre_treff_frame\" action=\"" . plugins_url('search.php' , __FILE__) . "\" method=\"GET\">\n";
-$out .= "<input type=\"text\" value=\"" . $hamedsok . "\" id=\"search\" name=\"s\" placeholder=\"S&oslash;k i samlingene...\" accept-charset=\"utf-8\" />";
+$out .= "S&oslash;keord:&nbsp";
+$out .= "<input type=\"text\" value=\"" . $hamedsok . "\" id=\"search\" name=\"s\" accept-charset=\"utf-8\" />";
 $out .= "&nbsp;<input type=\"submit\" value=\"S&oslash;k\">\n";
 $out .= "<input type=\"hidden\" name=\"mittbibliotek\" value=\"" . $brukbibliotek . "\" />\n";
 $out .= "<input type=\"hidden\" name=\"omslagbokkilden\" value=\"" . $omslagbokkilden . "\" />\n";
@@ -155,46 +156,58 @@ function enkeltpost_func($atts){
 		
 		$postout .= '<br style="clear: both;">' . "\n";
 		$ledige = 0;
-		foreach ($treff['bestand'][0] as $bestand) { // Noen ledige?
-			if ($bestand['h'] == "0") {
-				$ledige++;
+		if (is_array($treff['bestand'][0])) {
+			foreach ($treff['bestand'][0] as $bestand) { // Noen ledige?
+				if ($bestand['h'] == "0") {
+					$ledige++;
+				}
 			}
+		} else {
+			$uklar = 1; // uklar bestandsinfo
 		}
 		if ($ledige > 0) {
 			$postout .= '<span class="green"><strong>Ledig!</strong></span><br><br>' . "\n";
 		} else {
-			$postout .= '<span class="red"><strong>Ingen ledige...</strong></span><br><br>' . "\n";
+			if ($uklar = 1) {
+				$postout .= '<span class="orange"><strong>Uklar bestand... kontakt biblioteket!</strong></span><br><br>' . "\n";
+			} else {
+				$postout .= '<span class="red"><strong>Ingen ledige...</strong></span><br><br>' . "\n";
+			}
 		}
 
 		if (isset($treff['fulltekst'])) { // finnes den på nett?
 			$postout .= "<input class=\"onlineknapp\" type=\"button\" value=\"Les p&aring; nett\" onClick=\"location.href='" . $treff['fulltekst'] . "'\">\n";
 		}
 		$bestilleurl = str_replace ("websok?" , "mappami?jumpmode=reservering&" , $treff['permalink']); // oh, you clever
-		$postout .= "<input class=\"bestilleknapp\" type=\"button\" value=\"Bestille/reservere\" onClick=\"location.href='" . $bestilleurl . "'\">\n";
+		if ($bestilleurl != "") {
+			$postout .= "<input class=\"bestilleknapp\" type=\"button\" value=\"Bestille/reservere\" onClick=\"location.href='" . $bestilleurl . "'\">\n";
+		}
 		$bestilleurl = ''; // må rydde opp
+		$uklar = ''; // må rydde opp
 		$postout .= '</p>' . "\n";
 		$postout .= '</div>' . "\n"; // slutt på infoboks
-		$postout .= '<div class="bestandcontainer">' . "\n";
-		$postout .= '<h3>Eksemplarer:</h3>' . "\n";
-		$postout .= '<p>' . "\n";
-		foreach ($treff['bestand'][0] as $bestand) {
-			$postout .= $bestand['bibnavn'];
-			if (isset($bestand['b'])) {
-				$postout .= '&nbsp/&nbsp' . $bestand['b'];
+		if (is_array($treff['bestand'][0])) {
+			$postout .= '<div class="bestandcontainer">' . "\n";
+			$postout .= '<h3>Eksemplarer:</h3>' . "\n";
+			$postout .= '<p>' . "\n";
+			foreach ($treff['bestand'][0] as $bestand) {
+				$postout .= $bestand['bibnavn'];
+				if (isset($bestand['b'])) {
+					$postout .= '&nbsp/&nbsp' . $bestand['b'];
+				}
+				if (isset($bestand['c'])) {
+					$postout .= '&nbsp/&nbsp' . $bestand['c'];
+				}
+				$postout .= ' : ';
+				$postout .= bestandsinfo ($bestand['h'] , $bestand['f']); // status, restriction
+				if (($bestand['h'] == "4") || ($bestand['h'] == "5")) { // UTLÅNT
+					setlocale (LC_TIME , "nb_NO"); // norsk dato
+					$postout .= " til " . strftime("%e. %B %G" , strtotime($bestand['y']));
+				}
+				$postout .= '<br>' . "\n";
 			}
-			if (isset($bestand['c'])) {
-				$postout .= '&nbsp/&nbsp' . $bestand['c'];
-			}
-			$postout .= ' : ';
-			$postout .= bestandsinfo ($bestand['h'] , $bestand['f']); // status, restriction
-			if (($bestand['h'] == "4") || ($bestand['h'] == "5")) { // UTLÅNT
-				setlocale (LC_TIME , "nb_NO"); // norsk dato
-				$postout .= " til " . strftime("%e. %B %G" , strtotime($bestand['y']));
-			}
-			$postout .= '<br>' . "\n";
+			$postout .= '</div>' . "\n"; // slutt på bestand
 		}
-		$postout .= '</div>' . "\n"; // slutt på bestand
-
 	}
 
 

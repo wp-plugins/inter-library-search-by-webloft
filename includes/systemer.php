@@ -87,8 +87,10 @@ function bibliofil_sok($url, $posisjon) {
 	
 	// Vi må slenge på posisjon i URL-en
 	$url = $url . "&startRecord=" . $posisjon;
-	
+//echo "<h1>LESER SRU DATAFIL med URL " . $url . "</h1>";
 	$sru_datafil = get_content($url);
+//echo "<h1>" . $sru_datafil . "</h1>";
+//echo "<h1>" . microtime(true) . "</h1>";
 	$sru_data    = simplexml_load_string($sru_datafil);
 	
 	$namespaces = $sru_data->getNameSpaces(true);
@@ -110,7 +112,6 @@ function bibliofil_sok($url, $posisjon) {
 	require 'File/MARCXML.php';
 	
 	$journals = new File_MARCXML($newfile, File_MARC::SOURCE_STRING);
-	
 	// Iterate through the retrieved records
 	
 	$totalhtml  = '';
@@ -144,7 +145,7 @@ function bibliofil_sok($url, $posisjon) {
 			$forfatter                       = $record->getField("100")->getSubfield("a");
 			$treff[$hitcounter]['forfatter'] = substr($forfatter, 5); // fjerne feltkoden i starten
 		}
-		
+
 		if ($record->getField("110")) {
 			$korporasjon                       = $record->getField("110")->getSubfield("a");
 			$treff[$hitcounter]['korporasjon'] = substr($korporasjon, 5); // fjerne feltkoden i starten

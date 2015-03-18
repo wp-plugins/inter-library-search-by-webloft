@@ -52,7 +52,7 @@ $omslagbokkilden = stripslashes(strip_tags($_REQUEST['omslagbokkilden']));
 $omslagnb        = stripslashes(strip_tags($_REQUEST['omslagnb']));
 $hamedbilder     = stripslashes(strip_tags($_REQUEST['hamedbilder']));
 $bibsysbestand   = stripslashes(strip_tags($_REQUEST['bibsysbestand']));
-$sokeord         = stripslashes(strip_tags($_REQUEST['s']));
+$sokeord         = trim(stripslashes(strip_tags($_REQUEST['s'])));
 if (isset($_REQUEST['posisjon'])) {
 	$posisjon = (int) ($_REQUEST['posisjon']);
 } else {
@@ -91,13 +91,14 @@ foreach ($bibliotek as $ettbibliotek) {
 
   <title>Treffliste</title>
 
+<link href='http://fonts.googleapis.com/css?family=Muli' rel='stylesheet' type='text/css'>
 <link rel="stylesheet" href="results.css">
 <script type="text/javascript" src="js/hideframeonload.js"></script>
 
 </head>
 
 <body onLoad="hidereglitreframeLoading();">
-<div id="divreglitreframeLoading" style="position: absolute; top: 25px; left: 5px;">
+<div id="divreglitreframeLoading" style="position: absolute; top: 40px; left: 5px;">
 <img style="border: none; box-shadow: none;" src="icons/zzz.gif" alt="Laster..." />
 </div>
 
@@ -120,8 +121,9 @@ if ($mittsystem == 'bibsys') { // frasesøk i Bibsys
 if ($mittsystem == 'bibliofil') { // frasesøk i Bibliofil
 	if (stristr($sokeord, "\"")) {
 		$sokeord = str_replace("\"", "", $sokeord); // fjerne anførsel
-		$sokeord = str_replace(" ", "+AND+", trim($sokeord)); // Dette er semi-frasesøk
 	}
+	$sokeord = str_replace(" ", "+AND+", trim($sokeord)); // Dette er semi-frasesøk
+	$sokeord = str_replace(" ", "+", trim($sokeord)); // kan ikke ha mellomrom i URL
 }
 
 if ($mittsystem == 'koha') { // frasesøk i Koha
@@ -136,11 +138,12 @@ if ($mittsystem == 'koha') { // frasesøk i Koha
 
 // HTML template for one item
 
-$singlehtml = '<tr>';
+$singlehtml = '<tr>' . "\n";
+$singlehtml .= '<td class="row-pendelString">' . "\n";
 if ($hamedbilder == "1") { // skal vi egentlig vise bilder i det hele tatt, sånn i følge innstillingene?
-	$singlehtml .= '<td class="row-pendelString"><img class="omslag" src="omslagString" alt="tittelString" /></td>' . "\n";
+	$singlehtml .= '<img class="omslag" src="omslagString" alt="tittelString" />' . "\n";
 }
-$singlehtml .= '<td class="row-pendelString"><h3><a target="_parent" href="urlString">tittelString</a> (aarString)</h3>' . "\n";
+$singlehtml .= '<h3><a target="_parent" href="urlString">tittelString</a> (aarString)</h3>' . "\n";
 $singlehtml .= '<span class="opphav">opphavString</span>' . "\n";
 $singlehtml .= '<p>descriptionString</p>';
 $singlehtml .= 'isbnString' . "\n";
@@ -157,6 +160,7 @@ $singlehtml .= '</td></tr>' . "\n\n";
 // OK, skru sammen URL for søk
 
 if ($mittsystem == 'bibliofil') {
+
 	$url          = $minserver . "?version=1.2&operation=searchRetrieve&maximumRecords=" . $makstreff . "&query=" . $sokeord;
 	$treffliste   = bibliofil_sok($url, $posisjon);
 	$antallfunnet = bibliofil_antalltreff($url);
@@ -359,11 +363,11 @@ if ($antallfunnet > 0) { // kan være tom
 		
 		if ($forrigeposisjon >= 1) {
 			//		$viser .= "<input type=\"button\" onClick=\"hidereglitreframeLoading();location.href='" . $forrigelink . "'\" value='Forrige " . $treffperside . "'>\n";
-			$viser .= "<input type=\"button\" onClick=\"history.go(-1);\" value='Forrige " . $treffperside . "'>\n";
+			$viser .= "<input type=\"button\" onClick=\"history.go(-1);\" value='&laquo;&nbsp;Forrige " . $treffperside . "'>\n";
 			
 		}
 		if ($nesteposisjon < $antallfunnet) {
-			$viser .= "<input type=\"button\" onClick=\"showreglitreframeLoading();location.href='" . $nestelink . "'\" value='Neste " . $antalligjen . "'>\n";
+			$viser .= "<input type=\"button\" onClick=\"showreglitreframeLoading();location.href='" . $nestelink . "'\" value='Neste " . $antalligjen . "&nbsp;&raquo;'>\n";
 		}
 		$viser .= "</div>\n";
 	} else {
@@ -371,7 +375,7 @@ if ($antallfunnet > 0) { // kan være tom
 		$viser .= "Viser treff 1-" . $antallfunnet . " ved søk etter '" . $qsokeord . "'<br>";
 		$viser .= "</div>";
 	}
-	
+
 	echo "<div id=\"divreglitreframeFrameHolder\" style=\"display:block\">";
 	echo "<div class=\"reglitre_results\">\n";
 	echo "<div class=\"reglitre_results_header\">" . $viser . "</div>";
@@ -400,7 +404,8 @@ if ($antallfunnet > 0) { // kan være tom
 		$htmlout = @str_replace('materialtypeString', $treff['type'], $htmlout);
 		
 		if (isset($treff['fulltekst'])) {
-			$htmlout = @str_replace('onlineString', "<br><br><a target=\"_blank\" href=\"" . $treff['fulltekst'] . "\"><img src=\"icons/online.png\" alt=\"Les online!\" /></a>", $htmlout);
+			// $htmlout = @str_replace('onlineString', "<br><br><a target=\"_blank\" href=\"" . $treff['fulltekst'] . "\"><img src=\"icons/online.png\" alt=\"Les online!\" /></a>", $htmlout);
+			$htmlout = @str_replace('onlineString', "<br><br><a class=\"onlinelink\" target=\"_blank\" href=\"" . $treff['fulltekst'] . "\">Online!</a><br><br>", $htmlout);
 		} else {
 			$htmlout = @str_replace('onlineString', "", $htmlout);
 		}

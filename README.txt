@@ -3,7 +3,7 @@ Contributors: sundaune
 Tags: bibliotek, katalog, inter library search, search, søk, søking, søkemotor, bibliotekkatalog, bibliofil, bibsys, koha, metasøk, library, bibvenn, webløft, webloft, e-bok, ebok, e-book, e-books
 Requires at least: 4.0
 Tested up to: 4.1
-Stable tag: 1.0
+Stable tag: 1.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -125,11 +125,23 @@ NORWEGIAN:
 
 == Change log ==
 
+= 1.1 = 
+
+* Bugfix "costa rica": Pagination when search query contains several words not inside quotes
+* Bugfix: Treat search for several words as [word1 AND word2], not OR
+* New layout
+
 = 1.0 =
 
 * First version
 
 NORWEGIAN:
+
+= 1.1 =
+
+* Bugfix "costa rica": Paginering når man søkte på flere ord uten å sette i anførselstegn
+* Bugfix: Behandle søk etter flere ord som [ord1 OG ord2], ikke ELLER
+* Ny layout
 
 = 1.0 =
 
@@ -137,8 +149,8 @@ NORWEGIAN:
 
 == Upgrade Notice ==
 
-No upgrade notive at this point
+The search is behaving better, yielding far mor precise results. And it looks prettier, too!
 
 NORWEGIAN:
 
-Ingen beskjeder
+Søket oppfører seg bedre og gir mer presise resultater. Og det ser bedre ut også!
