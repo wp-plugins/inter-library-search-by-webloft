@@ -1,0 +1,89 @@
+.enkeltpostvisning {
+	width: 96%;
+	padding: 10px 2%;
+	margin: 40px auto;
+	border: 1px dashed #aaa;
+	}
+
+.enkeltpostvisning p {
+	line-height: 1.2em;
+}
+
+.enkeltpostvisning h2 {
+	margin: 0;
+	margin-bottom: 15px;
+	padding: 0;
+	line-height: 1em;
+	}
+
+.enkeltpostvisning h3 {
+	margin: 0;
+	margin-bottom: 15px;
+	padding: 0;
+	}
+
+.enkeltpostvisning h5 {
+	margin: 0;
+	padding: 0;
+	line-height: 1;
+	font-weight: 400;
+	}
+
+.bildecontainer {
+	width: 30%;
+	float: left;
+	margin-right: 2%;
+	}
+
+.bildecontainer img {
+	width: 150px;
+	height: auto;
+	}
+
+.infocontainer {
+	width: 68%;
+	float: right;
+	}
+
+.bestandcontainer {
+	width: 96%;
+	padding: 10px 2%;
+	margin: 0 auto;
+	clear: both;
+	background: #ffe;
+	border: 1px dotted #ddd;
+	}
+
+.green {
+	color: #090;
+	background: #ffe;
+	border-radius: 10px;
+	padding: 4px;
+	clear: both;
+	}
+
+.red {
+	color: #900;
+	background: #ffe;
+	border-radius: 10px;
+	padding: 4px;
+	clear: both;
+}
+
+.orange {
+	color: #222;
+	background: #ffe;
+	border-radius: 10px;
+	padding: 4px;
+	clear: both;
+}
+
+input.onlineknapp[type=button] {
+	width: 49%;
+	display: inline;
+}
+
+input.bestilleknapp[type=button] {
+	width: 49%;
+	display: inline;
+}
