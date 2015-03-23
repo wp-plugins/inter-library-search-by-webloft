@@ -12,10 +12,10 @@ function bestandsinfo ($status , $restriction) {
 			return "Ukjent status, utilgjengelig";
 			break;
 		case "4":
-			return "<strong>Utlånt</strong>";
+			return "Utlånt";
 			break;
 		case "5":
-			return "<strong>Utlånt</strong>";
+			return "Utlånt";
 			break;
 		case "6":
 			return "Under behandling";
@@ -36,7 +36,7 @@ function bestandsinfo ($status , $restriction) {
 			return "Hevdet innlevert eller aldri lånt";
 			break;
 		case "12":
-			return "<strong>Tapt</strong>";
+			return "Tapt";
 			break;
 		case "13":
 			return "Savnet - vi leter";
@@ -80,28 +80,28 @@ function bestandsinfo ($status , $restriction) {
 					return "[Ikke til utlån]";
 					break;
 				case "2":
-					return "<strong>Ledig</strong> [Til bruk i biblioteket]";
+					return "Ledig [Til bruk i biblioteket]";
 					break;
 				case "3":
-					return "<strong>Ledig</strong> [Dagslån]";
+					return "Ledig [Dagslån]";
 				case "4":
-					return "<strong>Ledig</strong> [Til bruk på lesesal el.l.]";
+					return "Ledig [Til bruk på lesesal el.l.]";
 					break;
 				case "5":
-					return "<strong>Ledig</strong> [Kan ikke fornyes]";
+					return "Ledig [Kan ikke fornyes]";
 					break;				
 				case "6":
-					return "<strong>Ledig</strong> [Begrenset lånetid]";
+					return "Ledig [Begrenset lånetid]";
 					break;				
 				case "8":
-					return "<strong>Ledig</strong> [Utvidet lånetid]";
+					return "Ledig [Utvidet lånetid]";
 					break;
 				case "9":
 				case "10":
-					return "<strong>Ledig</strong>";
+					return "Ledig";
 					break;
 				default:
-					return "<strong>Ledig</strong>";
+					return "Ledig";
 			}
 		default:
 			return "Ukjent status";

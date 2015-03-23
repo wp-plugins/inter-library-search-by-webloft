@@ -134,16 +134,35 @@ function bibliofil_sok($url, $posisjon) {
 		} else { // no permalink
 			$treff[$hitcounter]['permalink'] = "";
 		}
+
 		if ($record->getField("245")) {
 			$tittel                          = $record->getField("245")->getSubfield("a");
 			$treff[$hitcounter]['tittel']    = substr($tittel, 5); // fjerne feltkoden i starten
 			$subtittel                       = $record->getField("245")->getSubfield("b");
 			$treff[$hitcounter]['subtittel'] = substr($subtittel, 5); // fjerne feltkoden i starten
+			if ($record->getField("245")->getSubfield("c")) {
+				$ansvar                      = $record->getField("245")->getSubfield("c");
+				$treff[$hitcounter]['ansvarsangivelse'] = substr($ansvar, 5); // fjerne feltkoden i starten
+			}
 		}
 		
+		if ($record->getField("574")) { // Originaltittel
+			$originaltittel = $record->getField("574")->getSubfield("a");
+			$originaltittel = substr($originaltittel, 5); // fjerne feltkoden i starten
+			$originaltittel = str_ireplace ("originaltittel:" , "", $originaltittel);
+			$originaltittel = str_ireplace ("originaltittel :" , "", $originaltittel);
+			$originaltittel = str_ireplace ("originaltitler:" , "", $originaltittel);
+			$originaltittel = str_ireplace ("originaltitler :" , "", $originaltittel);
+			$treff[$hitcounter]['originaltittel'] = trim($originaltittel);
+		}
+
 		if ($record->getField("100")) {
 			$forfatter                       = $record->getField("100")->getSubfield("a");
 			$treff[$hitcounter]['forfatter'] = substr($forfatter, 5); // fjerne feltkoden i starten
+			if ($record->getField("100")->getSubfield("d")) {
+				$forfatterliv                = $record->getField("100")->getSubfield("d");
+				$treff[$hitcounter]['forfatterliv'] = substr($forfatterliv, 5); // fjerne feltkoden i starten
+			}
 		}
 
 		if ($record->getField("110")) {
@@ -154,6 +173,10 @@ function bibliofil_sok($url, $posisjon) {
 		if ($record->getField("20")) {
 			$isbn                       = $record->getField("20")->getSubfield("a");
 			$treff[$hitcounter]['isbn'] = substr($isbn, 5); // fjerne feltkoden i starten
+			if ($record->getField("20")->getSubfield("b")) {
+				$heftetbundet = $record->getField("20")->getSubfield("b");
+				$treff[$hitcounter]['heftetbundet'] = substr($heftetbundet, 5); // fjerne feltkoden i starten
+			}
 		}
 		
 		if ($record->getField("520")) {
@@ -175,6 +198,18 @@ function bibliofil_sok($url, $posisjon) {
 			
 		}
 		
+		if ($record->getField("300")) { // omfang
+			$omfang = $record->getField("300")->getSubfield("a");
+			$omfang = substr($omfang, 5);
+			if ($record->getField("300")->getSubfield("b")) {
+				$cheese = $record->getField("300")->getSubfield("b");
+				$cheese = substr($cheese, 5);
+				$omfang .= " : " . $cheese;
+			}
+		$treff[$hitcounter]['omfang'] = $omfang;
+		}
+
+
 		if ($record->getField("019")) {
 			$materialkode                       = $record->getField("019")->getSubfield("b");
 			$treff[$hitcounter]['materialkode'] = substr($materialkode, 5);
@@ -189,8 +224,15 @@ function bibliofil_sok($url, $posisjon) {
 		
 		// Ansvarsangivelse
 		
+		if (isset($treff[$hitcounter]['ansvarsangivelse'])) {
+			$treff[$hitcounter]['opphav'] = $treff[$hitcounter]['ansvarsangivelse'];
+		}
+
 		if (isset($treff[$hitcounter]['forfatter'])) {
 			$treff[$hitcounter]['opphav'] = $treff[$hitcounter]['forfatter'];
+			if (isset($treff[$hitcounter]['forfatterliv'])) {
+				$treff[$hitcounter]['opphav'] .= " (" . $treff[$hitcounter]['forfatterliv'] . ")";
+			}
 		}
 		
 		if (isset($treff[$hitcounter]['korporasjon'])) {
@@ -257,13 +299,12 @@ function bibliofil_sok($url, $posisjon) {
 			$treff[$hitcounter]['type'] = "ukjent";
 		}
 		
-		// Bestand
-		
-		//		$fields = $record->getfields('850');
+		// REPETERBARE FELTER SJEKKES HER
 		
 		foreach ($record->getFields() as $tag => $subfields) {
 			
-			// Skip everything except for 850 fields
+			// Bestand: Sjekke 850
+
 			if ($tag == '850') {
 				foreach ($subfields->getSubfields() as $code => $value) {
 					$ettfelt[(string) $code] = substr((string) $value, 5);
@@ -272,9 +313,94 @@ function bibliofil_sok($url, $posisjon) {
 				$etteks[] = $ettfelt;
 				unset($ettfelt);
 			}
+	
+			// Dewey: Sjekke 082 $a
+
+			if ($tag == '082') {
+				foreach ($subfields->getSubfields() as $code => $value) {
+					$ettfelt[(string) $code] = substr((string) $value, 5);
+				}
+				if (isset($ettfelt['a'])) {
+					$dewey = $ettfelt['a'];
+					$endewey[] = $dewey;
+				}
+			}
+
+			// Emneord: Sjekke 650 $a
+
+			if ($tag == '650') {
+				foreach ($subfields->getSubfields() as $code => $value) {
+					$ettfelt[(string) $code] = substr((string) $value, 5);
+				}
+				if ((isset($ettfelt['a'])) && ($ettfelt['a'] != "")) {
+					$emneord = $ettfelt['a'];
+					$ettemneord[] = $emneord;
+				}
+			}
+
+			// Generell note: Sjekke 500 $a
+
+			if ($tag == '500') {
+				foreach ($subfields->getSubfields() as $code => $value) {
+					$ettfelt[(string) $code] = substr((string) $value, 5);
+				}
+				if ((isset($ettfelt['a'])) && ($ettfelt['a'] != "")) {
+					$generellnote = $ettfelt['a'];
+					$engenerellnote[] = $generellnote;
+				}
+			}
+
+			// Innholdsnote: Sjekke 505 $a
+
+			if ($tag == '505') {
+				foreach ($subfields->getSubfields() as $code => $value) {
+					$ettfelt[(string) $code] = substr((string) $value, 5);
+				}
+				if ((isset($ettfelt['a'])) && ($ettfelt['a'] != "")) {
+					$innholdsnote = $ettfelt['a'];
+					$eninnholdsnote[] = $innholdsnote;
+				}
+			}
+
+			// Medarbeidernote: Sjekke 511 $a
+			
+			if ($tag == '511') {
+				foreach ($subfields->getSubfields() as $code => $value) {
+					$ettfelt[(string) $code] = substr((string) $value, 5);
+				}
+				if ((isset($ettfelt['a'])) && ($ettfelt['a'] != "")) {
+					$medarbeidere = $ettfelt['a'];
+					$enmedarbeidere[] = $medarbeidere;
+				}
+			}
+
+			// Titler: Sjekke 740 $a
+			
+			if ($tag == '740') {
+				foreach ($subfields->getSubfields() as $code => $value) {
+					$ettfelt[(string) $code] = substr((string) $value, 5);
+				}
+				if ((isset($ettfelt['a'])) && ($ettfelt['a'] != "")) {
+					$titler = $ettfelt['a'];
+					$entittel[] = $titler;
+				}
+			}
+
 		}
-		@$treff[$hitcounter]['bestand'][] = $etteks;
-		unset($etteks);
+		
+		if (isset($ettemneord) && (is_array($ettemneord))) {
+			$ettemneord = array_unique ($ettemneord);
+			sort ($ettemneord);
+			$treff[$hitcounter]['emneord'] = $ettemneord;
+		}
+		@$treff[$hitcounter]['bestand'] = $etteks;
+		@$treff[$hitcounter]['dewey'] = $endewey;
+		@$treff[$hitcounter]['generellnote'] = $engenerellnote;
+		@$treff[$hitcounter]['innholdsnote'] = $eninnholdsnote;
+		@$treff[$hitcounter]['medarbeidere'] = $enmedarbeidere;
+		@$treff[$hitcounter]['titler'] = $entittel;
+	
+		unset($etteks, $endewey, $ettemneord, $engenerellnote, $eninnholdsnote, $enmedarbeidere, $entittel);
 		
 		$hitcounter++;
 	} // slutt på hvert item
@@ -344,7 +470,7 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 	$treff      = '';
 	
 	while ($record = $journals->next()) {
-		
+	
 		// Elektronisk utgave finnes i 776
 		if ($record->getField("776")) {
 			if ($record->getField("776")->getSubfield("w")) {
@@ -385,21 +511,52 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 			}
 		}
 		
-		
 		if ($record->getField("245")) {
-			$tittel                       = $record->getField("245")->getSubfield("a");
-			$treff[$hitcounter]['tittel'] = substr($tittel, 5); // fjerne feltkoden i starten
+			$tittel                          = $record->getField("245")->getSubfield("a");
+			$treff[$hitcounter]['tittel']    = substr($tittel, 5); // fjerne feltkoden i starten
 			if ($record->getField("245")->getSubfield("b")) {
 				$subtittel                       = $record->getField("245")->getSubfield("b");
 				$treff[$hitcounter]['subtittel'] = substr($subtittel, 5); // fjerne feltkoden i starten
 			}
+			if ($record->getField("245")->getSubfield("c")) {
+				$ansvar                      = $record->getField("245")->getSubfield("c");
+				$treff[$hitcounter]['ansvarsangivelse'] = substr($ansvar, 5); // fjerne feltkoden i starten
+			}
+		}
+
+		if ($record->getField("246")) { // Originaltittel
+			if (($record->getField("246")->getSubfield("i")) && (stristr($record->getField("246")->getSubfield("i") , "originaltittel"))) {
+				$originaltittel = $record->getField("246")->getSubfield("a");
+				$originaltittel = substr($originaltittel, 5); // fjerne feltkoden i starten
+				$originaltittel = str_ireplace ("originaltittel:" , "", $originaltittel);
+				$originaltittel = str_ireplace ("originaltittel :" , "", $originaltittel);
+				$originaltittel = str_ireplace ("originaltitler:" , "", $originaltittel);
+				$originaltittel = str_ireplace ("originaltitler :" , "", $originaltittel);
+				$treff[$hitcounter]['originaltittel'] = trim($originaltittel);
+			}
+		}
+		
+		if ($record->getField("300")) { // omfang
+			$omfang = $record->getField("300")->getSubfield("a");
+			$omfang = substr($omfang, 5);
+			if ($record->getField("300")->getSubfield("b")) {
+				$cheese = $record->getField("300")->getSubfield("b");
+				$cheese = substr($cheese, 5);
+				$omfang .= " : " . $cheese;
+			}
+		$treff[$hitcounter]['omfang'] = $omfang;
 		}
 		
 		if ($record->getField("100")) {
 			$forfatter                       = $record->getField("100")->getSubfield("a");
 			$treff[$hitcounter]['forfatter'] = substr($forfatter, 5); // fjerne feltkoden i starten
+			if ($record->getField("100")->getSubfield("d")) {
+				$forfatterliv                = $record->getField("100")->getSubfield("d");
+				$treff[$hitcounter]['forfatterliv'] = substr($forfatterliv, 5); // fjerne feltkoden i starten
+			}
 		}
-		
+	
+	
 		if ($record->getField("110")) {
 			$korporasjon                       = $record->getField("110")->getSubfield("a");
 			$treff[$hitcounter]['korporasjon'] = substr($korporasjon, 5); // fjerne feltkoden i starten
@@ -408,6 +565,10 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 		if ($record->getField("20")) {
 			$isbn                       = $record->getField("20")->getSubfield("a");
 			$treff[$hitcounter]['isbn'] = substr($isbn, 5); // fjerne feltkoden i starten
+			if ($record->getField("20")->getSubfield("q")) {
+				$heftetbundet = $record->getField("20")->getSubfield("q");
+				$treff[$hitcounter]['heftetbundet'] = substr($heftetbundet, 5); // fjerne feltkoden i starten
+			}
 		}
 		
 		if ($record->getField("520")) {
@@ -444,7 +605,11 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 		
 		if (isset($treff[$hitcounter]['forfatter'])) {
 			$treff[$hitcounter]['opphav'] = $treff[$hitcounter]['forfatter'];
+			if (isset($treff[$hitcounter]['forfatterliv'])) {
+				$treff[$hitcounter]['opphav'] .= " (" . $treff[$hitcounter]['forfatterliv'] . ")";
+			}
 		}
+
 		
 		if (isset($treff[$hitcounter]['korporasjon'])) {
 			$treff[$hitcounter]['opphav'] = $treff[$hitcounter]['korporasjon'];
@@ -493,9 +658,83 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 		if ($treff[$hitcounter]['kategorikode'] == "s") { // Ops, periodika!!
 			$treff[$hitcounter]['type'] = "periodika";
 		}
+
+	
+		// REPETERBARE FELTER SJEKKES HER
+		
+		foreach ($record->getFields() as $tag => $subfields) {
+			
+			// Dewey: Sjekke 082 $a
+
+			if ($tag == '082') {
+				foreach ($subfields->getSubfields() as $code => $value) {
+					$ettfelt[(string) $code] = substr((string) $value, 5);
+				}
+				if (isset($ettfelt['a'])) {
+					$dewey = $ettfelt['a'];
+					$endewey[] = $dewey;
+				}
+			}
+
+			// Generell note: Sjekke 500 $a
+
+			if ($tag == '500') {
+				foreach ($subfields->getSubfields() as $code => $value) {
+					$ettfelt[(string) $code] = substr((string) $value, 5);
+				}
+				if ((isset($ettfelt['a'])) && ($ettfelt['a'] != "")) {
+					$generellnote = $ettfelt['a'];
+					$engenerellnote[] = $generellnote;
+				}
+			}
+
+			// Emneord: Sjekke 653 $a
+
+			if ($tag == '653') {
+				foreach ($subfields->getSubfields() as $code => $value) {
+					$ettfelt[(string) $code] = substr((string) $value, 5);
+				}
+				if (isset($ettfelt['a'])) {
+					$emne = $ettfelt['a'];
+					$ettemne[] = $emne;
+				}
+			}
+
+			// Titler: Sjekke 740 $a
+			
+			if ($tag == '740') {
+				foreach ($subfields->getSubfields() as $code => $value) {
+					$ettfelt[(string) $code] = substr((string) $value, 5);
+				}
+				if ((isset($ettfelt['a'])) && ($ettfelt['a'] != "")) {
+					$titler = $ettfelt['a'];
+					$entittel[] = $titler;
+				}
+			}
+
+			// Medarbeidere: Sjekke 511 $a
+			
+			if ($tag == '511') {
+				foreach ($subfields->getSubfields() as $code => $value) {
+					$ettfelt[(string) $code] = substr((string) $value, 5);
+				}
+				if ((isset($ettfelt['a'])) && ($ettfelt['a'] != "")) {
+					$medarbeidere = $ettfelt['a'];
+					$enmedarbeidere[] = $medarbeidere;
+				}
+			}
+		}	
+		// SLUTT PÅ REPETERBARE FELTER, LA OSS OPPDATERE OG RYDDE
+		@$treff[$hitcounter]['dewey'] = $endewey;
+		@$treff[$hitcounter]['emneord'] = $ettemne;
+		@$treff[$hitcounter]['generellnote'] = $engenerellnote;
+		@$treff[$hitcounter]['titler'] = $entittel;
+		@$treff[$hitcounter]['medarbeidere'] = $enmedarbeidere;
+	
+		unset($endewey, $ettemne, $engenerellnote, $entittel, $enmedarbeidere);
 		
 		$hitcounter++;
-		
+
 	} // slutt på hvert item
 	
 	// Sjekke bestand i Bibsys HVIS denne option er satt	

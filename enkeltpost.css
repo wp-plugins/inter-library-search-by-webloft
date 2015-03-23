@@ -45,15 +45,6 @@
 	float: right;
 	}
 
-.bestandcontainer {
-	width: 96%;
-	padding: 10px 2%;
-	margin: 0 auto;
-	clear: both;
-	background: #ffe;
-	border: 1px dotted #ddd;
-	}
-
 .green {
 	color: #090;
 	background: #ffe;
@@ -87,3 +78,71 @@ input.bestilleknapp[type=button] {
 	width: 49%;
 	display: inline;
 }
+
+
+/* TABS */
+
+/*----- Tabs -----*/
+.tabs {
+    width:100%;
+    display:inline-block;
+}
+ 
+    /*----- Tab Links -----*/
+    /* Clearfix */
+    .tab-links:after {
+        display:block;
+        clear:both;
+        content:'';
+    }
+
+	ul.tab-links {
+		margin-bottom: 0;
+		}
+ 
+    .tab-links li {
+		margin: 0;
+        margin-right: 5px;
+        float:left;
+        list-style:none;
+		color: #333;
+		font-weight: bold;
+    }
+ 
+        .tab-links a {
+            padding:9px 15px;
+            display:inline-block;
+            border-radius:10px 10px 0px 0px;
+            background:#ddd;
+            font-size:14px;
+            color: #333;
+			text-decoration: none;
+        }
+ 
+        .tab-links a:hover {
+            background:#eee;
+			color: #000;
+            text-decoration:none;
+        }
+ 
+    li.active a, li.active a:hover {
+        background:#eee;
+        color:#333;
+    }
+ 
+    /*----- Content of Tabs -----*/
+    .tab-content {
+        padding:15px;
+        border-radius:3px;
+        box-shadow:-1px 1px 1px rgba(0,0,0,0.15);
+        background:#eee;
+    }
+ 
+        .tab {
+            display:none;
+        }
+ 
+        .tab.active {
+            display:block;
+        }
+

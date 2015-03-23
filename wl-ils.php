@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: ILS Search by Webloft
-Plugin URI: http://www.sundaune.no/
+Plugin URI: http://www.webekspertene.no/
 Description: Interlibrary search for your Wordpress site! NORWEGIAN: Setter inn s&oslash;kefelt som lar deg s&oslash;ke i mange forskjellige bibliotekssystemer.
-Version: 1.1
-Author: H&aring;kon Sundaune
-Author URI: http://www.sundaune.no/
+Version: 1.2
+Author: H&aring;kon Sundaune / Webekspertene
+Author URI: http://www.webekspertene.no/
 */
 
 
@@ -92,9 +92,10 @@ return $out;
 // Andre kortkode: Viser enkeltpost på siden hvor kortkoden [enkeltpost] står
 //*******************************************************************************************
 
-function enkeltpost_func($atts){
+function enkeltpost_func($atts) {
 
 	wp_enqueue_style( 'wl_ils-enkeltpost', plugins_url( '/enkeltpost.css', __FILE__ ), false, '1.0', 'all' );
+	wp_enqueue_script('wl_ils-tabs-script', plugins_url( 'js/tabs.js', __FILE__ ), array('jquery') );
 
 	include dirname(__FILE__) . '/includes/enkeltpost_functions.php';
 
@@ -131,33 +132,36 @@ function enkeltpost_func($atts){
 		if ((isset ($treff['forfatter'])) && ($treff['forfatter'] != "")) {
 			$postout .= '<strong>Forfatter : </strong>' . $treff['forfatter'] . '<br>' . "\n";
 		}
-		
-		$utgitt = '';
-		if (isset($treff['utgitthvem'])) {
-			$utgitt = $treff['utgitthvem'];
-		}
-		if (isset($treff['utgitthvor'])) {
-			$utgitt .= ", " . $treff['utgitthvor'];
-		}
-		if (isset($treff['utgittaar'])) {
-			$utgitt .= ", " . $treff['utgittaar'];
-		}
-		if ($utgitt != "") {		
-			$postout .= '<strong>Utgitt : </strong>' . $utgitt . "<br>\n";
+
+		if ((isset ($treff['ansvarsangivelse'])) && ($treff['ansvarsangivelse'] != "")) {
+			$postout .= '<strong>Opphav : </strong>' . $treff['ansvarsangivelse'] . '<br>' . "\n";
 		}
 
+		$utgitt = '';
+		if ((isset($treff['utgitthvem'])) && (trim($treff['utgitthvem']) != "")) {
+			$utgitt = $treff['utgitthvem'];
+		} else {
+			$utgitt = "[s.n.]";
+		}
+		if ((isset($treff['utgitthvor'])) && (trim($treff['utgitthvor']) != "")) {
+			$utgitt .= ", " . $treff['utgitthvor'];
+		} else {
+			$utgitt .= ", [s.l.]";
+		}
+		if ((isset($treff['utgittaar'])) && (trim($treff['utgittaar']) != "")) {
+			$utgitt .= ", " . $treff['utgittaar'];
+		}
+		if ($utgitt != "") {
+			$postout .= '<strong>Utgitt : </strong>' . $utgitt . "<br>\n";
+		}
 		if ((isset($treff['isbn'])) && ($treff['isbn'] != "")) {
 			$postout .= '<strong>ISBN : </strong>' . $treff['isbn'] . "<br>\n";
 		}
 
-		if ((isset($treff['beskrivelse'])) && ($treff['beskrivelse'] != "")) {
-			$postout .= $treff['beskrivelse'] . '<br>' . "\n";
-		}
-		
 		$postout .= '<br style="clear: both;">' . "\n";
 		$ledige = 0;
-		if (is_array($treff['bestand'][0])) {
-			foreach ($treff['bestand'][0] as $bestand) { // Noen ledige?
+		if (is_array($treff['bestand'])) {
+			foreach ($treff['bestand'] as $bestand) { // Noen ledige?
 				if ($bestand['h'] == "0") {
 					$ledige++;
 				}
@@ -186,11 +190,21 @@ function enkeltpost_func($atts){
 		$uklar = ''; // må rydde opp
 		$postout .= '</p>' . "\n";
 		$postout .= '</div>' . "\n"; // slutt på infoboks
-		if (is_array($treff['bestand'][0])) {
-			$postout .= '<div class="bestandcontainer">' . "\n";
-			$postout .= '<h3>Eksemplarer:</h3>' . "\n";
-			$postout .= '<p>' . "\n";
-			foreach ($treff['bestand'][0] as $bestand) {
+
+		// EKSPERIMENTELL TAB-LØSNING
+
+		$postout .= '<div class="tabs">' . "\n";
+		$postout .= '<ul class="tab-links">' . "\n";
+		$postout .= '<li class="active"><a href="#tab1">Eksemplarer</a></li>' . "\n";
+		$postout .= '<li><a href="#tab2">Beskrivelse</a></li>' . "\n";
+		$postout .= '<li><a href="#tab3">Flere opplysninger</a></li>' . "\n";
+		$postout .= '</ul>' . "\n";
+		 
+		$postout .= '<div class="tab-content">' . "\n";
+		$postout .= '<div id="tab1" class="tab active">' . "\n";
+	
+		if (is_array($treff['bestand'])) {
+			foreach ($treff['bestand'] as $bestand) {
 				$postout .= $bestand['bibnavn'];
 				if (isset($bestand['b'])) {
 					$postout .= '&nbsp/&nbsp' . $bestand['b'];
@@ -199,15 +213,97 @@ function enkeltpost_func($atts){
 					$postout .= '&nbsp/&nbsp' . $bestand['c'];
 				}
 				$postout .= ' : ';
-				$postout .= bestandsinfo ($bestand['h'] , $bestand['f']); // status, restriction
+				if ((!isset($bestand['h'])) || (!isset($bestand['f']))) { // sett til ukjent hvis ikke satt 
+					$bestand['h'] = "1";
+					$bestand['f'] = "-1";
+				}
+				$postout .= "<strong>" . bestandsinfo ($bestand['h'] , $bestand['f']) . "</strong>"; // status, restriction
 				if (($bestand['h'] == "4") || ($bestand['h'] == "5")) { // UTLÅNT
 					setlocale (LC_TIME , "nb_NO"); // norsk dato
 					$postout .= " til " . strftime("%e. %B %G" , strtotime($bestand['y']));
 				}
-				$postout .= '<br>' . "\n";
+			$postout .= "<br>\n";
 			}
-			$postout .= '</div>' . "\n"; // slutt på bestand
 		}
+	
+		$postout .= '</div>' . "\n";
+ 
+		$postout .= '<div id="tab2" class="tab">' . "\n";
+		if ((isset($treff['beskrivelse'])) && ($treff['beskrivelse'] != "")) {
+			$postout .= '<p>' . $treff['beskrivelse'] . '</p>' . "\n";
+		}
+		$postout .= '</div>' . "\n";
+ 
+
+		$postout .= '<div id="tab3" class="tab">' . "\n";
+		$postout .= '<p>' . "\n";		
+
+		if (isset($treff['originaltittel'])) {
+			$postout .= "<strong>Originaltittel: </strong>" . $treff['originaltittel'] . "<br>\n";
+		}
+		
+		if (is_array($treff['dewey'])) {
+			$postout .= '<strong>Dewey : </strong>';
+			$alledewey = implode (" / " , $treff['dewey']);
+			$postout .= $alledewey . "<br>\n";
+		}
+		
+		if (isset($treff['generellnote'])) {
+			if (is_array($treff['generellnote'])) {
+				$generellnote = implode (". " , $treff['generellnote']);
+			} else {
+				$generellnote = $treff['generellnote'];
+			}
+			$postout .= "<strong>Generell note: </strong>" . $generellnote . "<br>\n";
+		}
+
+		if (isset($treff['innholdsnote'])) {
+			if (is_array($treff['innholdsnote'])) {
+				$innholdsnote = implode (". " , $treff['innholdsnote']);
+			} else {
+				$innholdsnote = $treff['innholdsnote'];
+			}
+			$postout .= "<strong>Innholdsnote: </strong>" . $innholdsnote . "<br>\n";
+		}
+
+
+		if (isset($treff['medarbeidere'])) {
+			if (is_array($treff['medarbeidere'])) {
+				$medarbeidere = implode (". " , $treff['medarbeidere']);
+			} else {
+				$medarbeidere = $treff['medarbeidere'];
+			}
+			$postout .= "<strong>Medarbeidere: </strong>" . $medarbeidere . "<br>\n";
+		}
+
+
+		if (isset($treff['titler'])) {
+			if (is_array($treff['titler'])) {
+				$titler = implode (" ; " , $treff['titler']);
+			} else {
+				$titler = $treff['titler'];
+			}
+			$postout .= "<strong>Tittelinformasjon: </strong>" . $titler . "<br>\n";
+		}
+
+
+		if (isset($treff['emneord'])) {
+			if (is_array($treff['emneord'])) {
+				$emneord = implode (" ; " , $treff['emneord']);
+			} else {
+				$emneord = $treff['emneord'];
+			}
+			$postout .= "<strong>Emneord: </strong>" . $emneord . "<br>\n";
+		}
+
+
+		$postout .= '</p>' . "\n";
+		$postout .= '</div>' . "\n";
+ 
+		$postout .= '</div>' . "\n";
+		$postout .= '</div>' . "\n";
+
+
 	}
 
 
@@ -229,14 +325,22 @@ function enkeltpost_func($atts){
 			$postout .= '<strong>Forfatter : </strong>' . $treff['forfatter'] . '<br>' . "\n";
 		}
 		
+		if ((isset ($treff['ansvarsangivelse'])) && ($treff['ansvarsangivelse'] != "")) {
+			$postout .= '<strong>Opphav : </strong>' . $treff['ansvarsangivelse'] . '<br>' . "\n";
+		}
+
 		$utgitt = '';
-		if (isset($treff['utgitthvem'])) {
+		if ((isset($treff['utgitthvem'])) && (trim($treff['utgitthvem']) != "")) {
 			$utgitt = $treff['utgitthvem'];
+		} else {
+			$utgitt = "[s.n.]";
 		}
-		if (isset($treff['utgitthvor'])) {
+		if ((isset($treff['utgitthvor'])) && (trim($treff['utgitthvor']) != "")) {
 			$utgitt .= ", " . $treff['utgitthvor'];
+		} else {
+			$utgitt .= ", [s.l.]";
 		}
-		if (isset($treff['utgittaar'])) {
+		if ((isset($treff['utgittaar'])) && (trim($treff['utgittaar']) != "")) {
 			$utgitt .= ", " . $treff['utgittaar'];
 		}
 		if ($utgitt != "") {
@@ -280,10 +384,21 @@ function enkeltpost_func($atts){
 		$bestilleurl = ''; // må rydde opp
 		$postout .= '</p>' . "\n";
 		$postout .= '</div>' . "\n"; // slutt på infoboks
+		
+		// EKSPERIMENTELL TAB-LØSNING
+
+		$postout .= '<div class="tabs">' . "\n";
+		$postout .= '<ul class="tab-links">' . "\n";
+		$postout .= '<li class="active"><a href="#tab1">Eksemplarer</a></li>' . "\n";
+		$postout .= '<li><a href="#tab2">Beskrivelse</a></li>' . "\n";
+		$postout .= '<li><a href="#tab3">Flere opplysninger</a></li>' . "\n";
+		$postout .= '</ul>' . "\n";
+		 
+		$postout .= '<div class="tab-content">' . "\n";
+		$postout .= '<div id="tab1" class="tab active">' . "\n";
+		$postout .= '<p>' . "\n";
+	
 		if ((isset($treff['bestand'])) && (is_array($treff['bestand']))) { // bare hvis vi har bestandinfo
-			$postout .= '<div class="bestandcontainer">' . "\n";
-			$postout .= '<h3>Eksemplarer:</h3>' . "\n";
-			$postout .= '<p>' . "\n";
 			foreach ($treff['bestand'] as $bestand) {
 				$postout .= $bestand->institution;
 				if (isset($bestand->collection)) {
@@ -293,15 +408,89 @@ function enkeltpost_func($atts){
 					$postout .= '&nbsp/&nbsp' . $bestand->callnumber;
 				}
 				$postout .= ' : ';
-				$postout .= bestandsinfo ($bestand->circulationStatus , $bestand->useRestriction); // status, restriction
+				$postout .= "<strong>" . bestandsinfo ($bestand->circulationStatus , $bestand->useRestriction) . "</strong>"; // status, restriction
 				if (($bestand->circulationStatus == "4") || ($bestand->circulationStatus == "5")) { // UTLÅNT
 					setlocale (LC_TIME , "nb_NO"); // norsk dato
 					$postout .= " til " . strftime("%e. %B %G" , strtotime($bestand['y']));
 				}
-				$postout .= '<br>' . "\n";
+			$postout .= "<br>\n";
 			}
-			$postout .= '</div>' . "\n"; // slutt på bestand
+		$postout .= '</p>' . "\n";
 		}
+
+		$postout .= '</div>' . "\n";
+ 
+		$postout .= '<div id="tab2" class="tab">' . "\n";
+		$postout .= '<p>' . "\n";
+
+		if ((isset($treff['beskrivelse'])) && ($treff['beskrivelse'] != "")) {
+			$postout .= $treff['beskrivelse'] . '<br>' . "\n";
+		}
+
+		if (isset($treff['medarbeidere'])) {
+			if (is_array($treff['medarbeidere'])) {
+				$medarbeidere = implode (". " , $treff['medarbeidere']);
+			} else {
+				$medarbeidere = $treff['medarbeidere'];
+			}
+			$postout .= "<strong>Medarbeidere: </strong>" . $medarbeidere . "<br>\n";
+		}
+
+		if (isset($treff['generellnote'])) {
+			if (is_array($treff['generellnote'])) {
+				$generellnote = implode (". " , $treff['generellnote']);
+			} else {
+				$generellnote = $treff['generellnote'];
+			}
+			$postout .= "<strong>Generell note: </strong>" . $generellnote . "<br>\n";
+		}
+
+		$postout .= '</p>' . "\n";
+		$postout .= '</div>' . "\n";
+ 
+
+		$postout .= '<div id="tab3" class="tab">' . "\n";
+		$postout .= '<p>' . "\n";	
+
+		if (isset($treff['originaltittel'])) {
+			$postout .= "<strong>Originaltittel: </strong>" . $treff['originaltittel'] . "<br>\n";
+		}		
+		
+		if (is_array($treff['dewey'])) {
+			$postout .= '<strong>Dewey : </strong>';
+			$alledewey = implode (" / " , $treff['dewey']);
+			$postout .= $alledewey . "<br>\n";
+		}
+
+
+		if (isset($treff['titler'])) {
+			if (is_array($treff['titler'])) {
+				$titler = implode (" ; " , $treff['titler']);
+			} else {
+				$titler = $treff['titler'];
+			}
+			$postout .= "<strong>Tittelinformasjon: </strong>" . $titler . "<br>\n";
+		}
+
+
+		if (isset($treff['emneord'])) {
+			if (is_array($treff['emneord'])) {
+				$emneord = implode (" ; " , $treff['emneord']);
+			} else {
+				$emneord = $treff['emneord'];
+			}
+			$postout .= "<strong>Emneord: </strong>" . $emneord . "<br>\n";
+		}
+
+		$postout .= '</p>' . "\n";
+		$postout .= '</div>' . "\n";
+ 
+		$postout .= '</div>' . "\n";
+		
+		
+		
+		
+
 	}
 
 	// ************* KOHA-VISNING ******************

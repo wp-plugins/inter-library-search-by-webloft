@@ -143,10 +143,15 @@ $singlehtml .= '<td class="row-pendelString">' . "\n";
 if ($hamedbilder == "1") { // skal vi egentlig vise bilder i det hele tatt, sånn i følge innstillingene?
 	$singlehtml .= '<img class="omslag" src="omslagString" alt="tittelString" />' . "\n";
 }
-$singlehtml .= '<h3><a target="_parent" href="urlString">tittelString</a> (aarString)</h3>' . "\n";
+$singlehtml .= '<h3><a target="_blank" href="urlString">tittelString</a> (aarString)</h3>' . "\n";
 $singlehtml .= '<span class="opphav">opphavString</span>' . "\n";
 $singlehtml .= '<p>descriptionString</p>';
+$singlehtml .= '<p>' . "\n";
+$singlehtml .= 'titteloriginalString' . "\n";
 $singlehtml .= 'isbnString' . "\n";
+$singlehtml .= 'omfangString' . "\n";
+$singlehtml .= 'deweyString' . "\n";
+$singlehtml .= '</p>' . "\n";
 $singlehtml .= '</td>' . "\n";
 $singlehtml .= '<td class="row-pendelString" style="text-align: center;">' . "\n";
 if ($mittsystem != 'koha') { // koha har ikke materialtype, da dropper vi denne 
@@ -260,7 +265,7 @@ if ($antallfunnet > 0) { // kan være tom
 	
 } // slutt på sjekk om antallfunnet > 0
 
-
+//domp ($treffliste);
 
 //**********************************************************************************
 // Hvis vi skal vise poster på egne sider må vi fikse alle permalenkene
@@ -277,8 +282,6 @@ if (stristr($_SERVER['HTTP_REFERER'] , "enkeltposturl")) { // Vi har det i refer
 	}
 	$enkeltposturl = base64_decode(urldecode(str_replace ("enkeltposturl=" , "" , $dump)));
 }
-
-//echo "<h1>||" . $_SERVER['HTTP_REFERER'] . "||</h1>";
 
 
 if ((isset($enkeltposturl)) && ($enkeltposturl != "")) { // det finnes en url til side hvor enkeltposter skal vises
@@ -406,16 +409,24 @@ if ($antallfunnet > 0) { // kan være tom
 		if (isset($treff['fulltekst'])) {
 			// $htmlout = @str_replace('onlineString', "<br><br><a target=\"_blank\" href=\"" . $treff['fulltekst'] . "\"><img src=\"icons/online.png\" alt=\"Les online!\" /></a>", $htmlout);
 			$htmlout = @str_replace('onlineString', "<br><br><a class=\"onlinelink\" target=\"_blank\" href=\"" . $treff['fulltekst'] . "\">Online!</a><br><br>", $htmlout);
-		} else {
-			$htmlout = @str_replace('onlineString', "", $htmlout);
 		}
-		
+
 		if ((isset($treff['isbn'])) && (trim($treff['isbn']) != "")) {
-			$htmlout = @str_replace('isbnString', "<p>ISBN: " . $treff['isbn'] . "</p>\n", $htmlout);
-		} else {
-			$htmlout = @str_replace('isbnString', "", $htmlout);
+			$altmedisbn = trim($treff['isbn']);
+			if ((isset($treff['heftetbundet'])) && (trim($treff['heftetbundet']) != "")) {
+				$altmedisbn .= " (" . $treff['heftetbundet'] . ")";
+			}
+			$htmlout = @str_replace('isbnString', "<strong>ISBN: </strong>" . $altmedisbn . "<br>\n", $htmlout);
 		}
-		
+
+		if ((isset($treff['omfang'])) && (trim($treff['omfang']) != "")) {
+			$htmlout = @str_replace('omfangString', "<strong>Omfang: </strong>" . $treff['omfang'] . "<br>\n", $htmlout);
+		}
+
+		if ((isset($treff['originaltittel'])) && (trim($treff['originaltittel']) != "")) {
+			$htmlout = @str_replace('titteloriginalString', "<strong>Originaltittel: </strong>" . $treff['originaltittel'] . "<br>\n", $htmlout);
+		}
+
 		// Bestand Bibsys...
 		// Men innstillingen må være aktivert!	
 		
@@ -494,27 +505,25 @@ if ($antallfunnet > 0) { // kan være tom
 			$begrenset     = 0;
 			$bestandhtml   = '';
 
-			
+//domp ($treff['bestand']);			
 			if (is_array($treff['bestand'])) { // Bare hvis array
-				foreach ($treff['bestand'] as $bestand) {
-					foreach ($bestand as $enkelteks) {
-						@$status      = $enkelteks["h"];
-						@$begrensning = $enkelteks	["f"];
-						switch ($status) {
-							case "0":
-								if (($begrensning == "2") || ($begrensning == "3") || ($begrensning == "4") || ($begrensning == "6")) {
-									$begrenset++;
-								} else {
-									$tilgjengelig++;
-								}
-								break;
-							case "4":
-								$utlant++;
-								break;
-							default:
-								$utilgjengelig++;
-								break;
-						}
+				foreach ($treff['bestand'] as $enkelteks) {
+					@$status      = $enkelteks["h"];
+					@$begrensning = $enkelteks	["f"];
+					switch ($status) {
+						case "0":
+							if (($begrensning == "2") || ($begrensning == "3") || ($begrensning == "4") || ($begrensning == "6")) {
+								$begrenset++;
+							} else {
+								$tilgjengelig++;
+							}
+							break;
+						case "4":
+							$utlant++;
+							break;
+						default:
+							$utilgjengelig++;
+							break;
 					}
 				}	
 			}
@@ -542,12 +551,27 @@ if ($antallfunnet > 0) { // kan være tom
 		
 		if ((isset($bestandhtml)) && ($bestandhtml != '')) {
 			$htmlout = @str_replace('bestandString', $bestandhtml, $htmlout);
-		} else { // Nope, intet. Her er ikke mer...
-			$htmlout = @str_replace('bestandString', '', $htmlout);
 		}
 		
 		$htmlout = @str_replace('pendelString', $pendel, $htmlout);
 		$htmlout = @str_replace('descriptionString', trunc($treff['beskrivelse'], 40), $htmlout);
+
+		// RYDD OPP I UBRUKTE STRENGER - FJERN DEM!!
+
+		$htmlout = str_replace ("pendelString" , "" , $htmlout);
+		$htmlout = str_replace ("omslagString" , "" , $htmlout);
+		$htmlout = str_replace ("tittelString" , "" , $htmlout);
+		$htmlout = str_replace ("urlString" , "" , $htmlout);
+		$htmlout = str_replace ("aarString" , "" , $htmlout);
+		$htmlout = str_replace ("opphavString" , "" , $htmlout);
+		$htmlout = str_replace ("descriptionString" , "" , $htmlout);
+		$htmlout = str_replace ("isbnString" , "" , $htmlout);
+		$htmlout = str_replace ("omfangString" , "" , $htmlout);
+		$htmlout = str_replace ("deweyString" , "" , $htmlout);
+		$htmlout = str_replace ("materialtypeString" , "" , $htmlout);
+		$htmlout = str_replace ("onlineString" , "" , $htmlout);
+		$htmlout = str_replace ("bestandString" , "" , $htmlout);
+		$htmlout = str_replace ("titteloriginalString" , "" , $htmlout);
 
 		echo $htmlout;
 	

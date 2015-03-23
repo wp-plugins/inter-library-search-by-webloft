@@ -1,9 +1,9 @@
 === ILS Search by Webloft ===
 Contributors: sundaune
-Tags: bibliotek, katalog, inter library search, search, søk, søking, søkemotor, bibliotekkatalog, bibliofil, bibsys, koha, metasøk, library, bibvenn, webløft, webloft, e-bok, ebok, e-book, e-books
+Tags: bibliotek, katalog, inter library search, search, søk, søking, søkemotor, bibliotekkatalog, bibliofil, bibsys, koha, metasøk, library, bibvenn, webekspertene, webløft, webloft, e-bok, ebok, e-book, e-books
 Requires at least: 4.0
 Tested up to: 4.1
-Stable tag: 1.1
+Stable tag: 1.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -125,6 +125,12 @@ NORWEGIAN:
 
 == Change log ==
 
+= 1.2 = 
+
+* A LOT of additional info on each item (020$b,082$a,100$d,245$c,300$a/b,500$a,505$a,511$a,574$a,650$a,740$a etc.) 
+* Tab based view of single post information
+* Code optimalization
+
 = 1.1 = 
 
 * Bugfix "costa rica": Pagination when search query contains several words not inside quotes
@@ -136,6 +142,12 @@ NORWEGIAN:
 * First version
 
 NORWEGIAN:
+
+= 1.2 =
+
+* MYE mer informasjon om hvert enkelt treff (020$b,082$a,100$d,245$c,300$a/b,500$a,505$a,511$a,574$a,650$a,740$a etc.) 
+* Fanebasert visning av informasjon for enkelttreff
+* Kodeoptimalisering
 
 = 1.1 =
 
