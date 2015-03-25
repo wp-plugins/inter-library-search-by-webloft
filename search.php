@@ -2,12 +2,11 @@
 
 $reglitre_debug = 0; // Sett til 1 for debug
 
-/*
+
 // turn on for debug
 ini_set('display_startup_errors',1);
 ini_set('display_errors',1);
 error_reporting(-1);
-*/
 
 
 /*
@@ -41,8 +40,8 @@ $omslagsserver = "http://bokforsider.webloft.no";
 
 $time_start = microtime(true);
 
-require("includes/systemer.php"); // forskjellige bib.systemers måte å søke på
-require("includes/functions.php"); // funksjoner vi har bruk for
+require_once("includes/systemer.php"); // forskjellige bib.systemers måte å søke på
+require_once("includes/functions.php"); // funksjoner vi har bruk for
 
 $mittbibliotek   = stripslashes(strip_tags($_REQUEST['mittbibliotek']));
 if (isset($_REQUEST['enkeltposturl'])) {
@@ -98,8 +97,8 @@ foreach ($bibliotek as $ettbibliotek) {
 </head>
 
 <body onLoad="hidereglitreframeLoading();">
-<div id="divreglitreframeLoading" style="position: absolute; top: 40px; left: 5px;">
-<img style="border: none; box-shadow: none;" src="icons/zzz.gif" alt="Laster..." />
+<div id="divreglitreframeLoading" style="text-align: center; margin-top: 20px;">
+<img style="border: none; box-shadow: none;" src="icons/zzz.png" alt="Laster..." />
 </div>
 
 <?php
@@ -407,8 +406,8 @@ if ($antallfunnet > 0) { // kan være tom
 		$htmlout = @str_replace('materialtypeString', $treff['type'], $htmlout);
 		
 		if (isset($treff['fulltekst'])) {
-			// $htmlout = @str_replace('onlineString', "<br><br><a target=\"_blank\" href=\"" . $treff['fulltekst'] . "\"><img src=\"icons/online.png\" alt=\"Les online!\" /></a>", $htmlout);
-			$htmlout = @str_replace('onlineString', "<br><br><a class=\"onlinelink\" target=\"_blank\" href=\"" . $treff['fulltekst'] . "\">Online!</a><br><br>", $htmlout);
+			$htmlout = @str_replace('onlineString', "<br><br><a target=\"_blank\" href=\"" . $treff['fulltekst'] . "\"><img src=\"icons/online.png\" alt=\"Les online!\" /></a>", $htmlout);
+			//$htmlout = @str_replace('onlineString', "<br><br><a class=\"onlinelink\" target=\"_blank\" href=\"" . $treff['fulltekst'] . "\">Online!</a><br><br>", $htmlout);
 		}
 
 		if ((isset($treff['isbn'])) && (trim($treff['isbn']) != "")) {
@@ -454,33 +453,34 @@ if ($antallfunnet > 0) { // kan være tom
 								break;
 						}
 					}
-					
-					$bestandhtml = "<br>\n";
-					if ($tilgjengelig > 0) {
-						$bestandhtml .= "<div class=\"tilgang_groenn tilgang_boks\">\n";
-						$bestandhtml .= "Tilgjengelig&nbsp;:&nbsp;" . $tilgjengelig . "\n";
-						$bestandhtml .= "</div>\n";
-					}
-					if (($begrenset + $utlant) > 0) {
-						$bestandhtml .= "<div class=\"tilgang_orange tilgang_boks\">\n";
-						$bestandhtml .= "Begrenset/utlånt&nbsp;:&nbsp;" . ($begrenset + $utlant) . "&nbsp;\n";
-						$bestandhtml .= "</div>\n";
-					}
-					if ($utilgjengelig > 0) {
-						$bestandhtml .= "<div class=\"tilgang_roed tilgang_boks\">\n";
-						$bestandhtml .= "Utilgjengelig&nbsp;:&nbsp;" . $utilgjengelig . "\n";
-						$bestandhtml .= "</div>\n";
-					}
-				} else { // vi har ikke bestandsinfo fordi bestand er ikke en array
-					$bestandhtml = "<br>\n";
-					$bestandhtml .= "<div class=\"tilgang_roed tilgang_boks\">\n";
-					$bestandhtml .= "Utilgjengelig\n";
-					$bestandhtml .= "</div>\n";
 				}
-			}	
-		
+
+			$totaleks = (int)$tilgjengelig + (int)$begrenset + (int)$utlant + (int)$utilgjengelig;
+
+			$bestandhtml = "<br>\n";
+			if ($tilgjengelig > 0) {
+				$bestandhtml .= "<div class=\"tilgang_boks\">";
+				$bestandhtml .= "<img src=\"" . ilsdot("green") . "\" alt=\"Grønn dott\" />";
+				$bestandhtml .= "<p>Ledig&nbsp;:&nbsp;" . $tilgjengelig . "</p>\n";
+				$bestandhtml .= "</div>\n";
+			} elseif (($tilgjengelig == 0) && (($begrenset + $utlant) > 0)) {
+				$bestandhtml .= "<div class=\"tilgang_boks\">";
+				$bestandhtml .= "<img src=\"" . ilsdot("orange") . "\" alt=\"Orange dott\" />";
+				$bestandhtml .= "<p>Utlånt el.l.&nbsp;:&nbsp;" . ($begrenset + $utlant) . "</p>\n";
+				$bestandhtml .= "</div>\n";
+			} elseif ($utilgjengelig > 0) { // utilgjengelig
+				$bestandhtml .= "<div class=\"tilgang_boks\">";
+				$bestandhtml .= "<img src=\"" . ilsdot("red") . "\" alt=\"Rød dott\" />";
+				$bestandhtml .= "<p>Ikke ledig&nbsp;:&nbsp;" . $utilgjengelig . "</p>\n";
+				$bestandhtml .= "</div>\n";
+			} else {
+				$bestandhtml .= "<div class=\"tilgang_boks\">";
+				$bestandhtml .= "<img src=\"" . ilsdot("red") . "\" alt=\"Rød dott\" />";
+				$bestandhtml .= "<p>Uklar bestand!</p>\n";
+				$bestandhtml .= "</div>\n";
+			}		
 		}
-		
+		}
 		// BESTAND I BIBLIOFIL
 		
 		// Finner vi alltid i 850 - men hvis ikke er det utilgjengelig
@@ -505,7 +505,7 @@ if ($antallfunnet > 0) { // kan være tom
 			$begrenset     = 0;
 			$bestandhtml   = '';
 
-//domp ($treff['bestand']);			
+	
 			if (is_array($treff['bestand'])) { // Bare hvis array
 				foreach ($treff['bestand'] as $enkelteks) {
 					@$status      = $enkelteks["h"];
@@ -528,23 +528,31 @@ if ($antallfunnet > 0) { // kan være tom
 				}	
 			}
 			$bestandhtml = "<br>\n";
-			if ($tilgjengelig > 0) {
-				$bestandhtml .= "<div class=\"tilgang_groenn tilgang_boks\">\n";
-				$bestandhtml .= "Tilgjengelig&nbsp;:&nbsp;" . $tilgjengelig . "\n";
-				$bestandhtml .= "</div>\n";
-			}
-			if (($begrenset + $utlant) > 0) {
-				$bestandhtml .= "<div class=\"tilgang_orange tilgang_boks\">\n";
-				$bestandhtml .= "Begrenset/utlånt&nbsp;:&nbsp;" . ($begrenset + $utlant) . "&nbsp;\n";
-				$bestandhtml .= "</div>\n";
-			}
-			if ($utilgjengelig > 0) {
-				$bestandhtml .= "<div class=\"tilgang_roed tilgang_boks\">\n";
-				$bestandhtml .= "Utilgjengelig&nbsp;:&nbsp;" . $utilgjengelig . "\n";
-				$bestandhtml .= "</div>\n";
-			}
-		
 
+			$totaleks = (int)$tilgjengelig + (int)$begrenset + (int)$utlant + (int)$utilgjengelig;
+
+
+			if ($tilgjengelig > 0) {
+				$bestandhtml .= "<div class=\"tilgang_boks\">";
+				$bestandhtml .= "<img src=\"" . ilsdot("green") . "\" alt=\"Grønn dott\" />";
+				$bestandhtml .= "<p>Ledig&nbsp;:&nbsp;" . $tilgjengelig . "</p>\n";
+				$bestandhtml .= "</div>\n";
+			} elseif (($tilgjengelig == 0) && (($begrenset + $utlant) > 0)) {
+				$bestandhtml .= "<div class=\"tilgang_boks\">";
+				$bestandhtml .= "<img src=\"" . ilsdot("orange") . "\" alt=\"Orange dott\" />";
+				$bestandhtml .= "<p>Utlånt el.l.&nbsp;:&nbsp;" . ($begrenset + $utlant) . "</p>\n";
+				$bestandhtml .= "</div>\n";
+			} elseif ($utilgjengelig > 0) { // utilgjengelig
+				$bestandhtml .= "<div class=\"tilgang_boks\">";
+				$bestandhtml .= "<img src=\"" . ilsdot("red") . "\" alt=\"Rød dott\" />";
+				$bestandhtml .= "<p>Ikke ledig&nbsp;:&nbsp;" . $utilgjengelig . "</p>\n";
+				$bestandhtml .= "</div>\n";
+			} else {
+				$bestandhtml .= "<div class=\"tilgang_boks\">";
+				$bestandhtml .= "<img src=\"" . ilsdot("red") . "\" alt=\"Rød dott\" />";
+				$bestandhtml .= "<p>Uklar bestand!</p>\n";
+				$bestandhtml .= "</div>\n";
+			}
 		}
 		
 		// Så bytter vi ut hvis vi har noe
@@ -585,7 +593,11 @@ if ($antallfunnet > 0) { // kan være tom
 	echo "Ingen treff!";
 	echo "</div>";
 }
-echo "</div>\n"; // slutt på holder for spinner
+//echo "</div>\n"; // slutt på holder for spinner
+
+
+
+
 ?>
 
 </body>

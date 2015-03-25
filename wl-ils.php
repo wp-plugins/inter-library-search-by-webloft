@@ -3,7 +3,7 @@
 Plugin Name: ILS Search by Webloft
 Plugin URI: http://www.webekspertene.no/
 Description: Interlibrary search for your Wordpress site! NORWEGIAN: Setter inn s&oslash;kefelt som lar deg s&oslash;ke i mange forskjellige bibliotekssystemer.
-Version: 1.2
+Version: 1.2.1
 Author: H&aring;kon Sundaune / Webekspertene
 Author URI: http://www.webekspertene.no/
 */
@@ -97,7 +97,7 @@ function enkeltpost_func($atts) {
 	wp_enqueue_style( 'wl_ils-enkeltpost', plugins_url( '/enkeltpost.css', __FILE__ ), false, '1.0', 'all' );
 	wp_enqueue_script('wl_ils-tabs-script', plugins_url( 'js/tabs.js', __FILE__ ), array('jquery') );
 
-	include dirname(__FILE__) . '/includes/enkeltpost_functions.php';
+	require_once dirname(__FILE__) . '/includes/functions.php';
 
 	$info = stristr($_SERVER['REQUEST_URI'] , "enkeltpostinfo="); // fra og med "enkeltpost="
 	if (stristr($info , "&")) { 
@@ -159,7 +159,9 @@ function enkeltpost_func($atts) {
 		}
 
 		$postout .= '<br style="clear: both;">' . "\n";
+
 		$ledige = 0;
+		$uklar = 0;
 		if (is_array($treff['bestand'])) {
 			foreach ($treff['bestand'] as $bestand) { // Noen ledige?
 				if ($bestand['h'] == "0") {
@@ -167,15 +169,15 @@ function enkeltpost_func($atts) {
 				}
 			}
 		} else {
-			$uklar = 1; // uklar bestandsinfo
+			$uklar = 1; // bestand er ikke array, uklar bestandsinfo
 		}
 		if ($ledige > 0) {
-			$postout .= '<span class="green"><strong>Ledig!</strong></span><br><br>' . "\n";
+			$postout .= '<img src="' . ilsdot("green") . '" alt="Ledig!" />&nbsp;Ledig!<br><br>' . "\n";
 		} else {
-			if ($uklar = 1) {
-				$postout .= '<span class="orange"><strong>Uklar bestand... kontakt biblioteket!</strong></span><br><br>' . "\n";
+			if ($uklar == 1) {
+				$postout .= '<img src="' . ilsdot("red") . '" alt="Uklar bestand" />&nbsp;Uklar bestand - kontakt biblioteket!<br><br>' . "\n";
 			} else {
-				$postout .= '<span class="red"><strong>Ingen ledige...</strong></span><br><br>' . "\n";
+				$postout .= '<img src="' . ilsdot("red") . '" alt="Ingen ledige!" />&nbsp;Ingen ledige...<br><br>' . "\n";
 			}
 		}
 
@@ -194,7 +196,7 @@ function enkeltpost_func($atts) {
 		// EKSPERIMENTELL TAB-LØSNING
 
 		$postout .= '<div class="tabs">' . "\n";
-		$postout .= '<ul class="tab-links">' . "\n";
+		$postout .= '<ul class="tab-links" style="padding: 0;">' . "\n";
 		$postout .= '<li class="active"><a href="#tab1">Eksemplarer</a></li>' . "\n";
 		$postout .= '<li><a href="#tab2">Beskrivelse</a></li>' . "\n";
 		$postout .= '<li><a href="#tab3">Flere opplysninger</a></li>' . "\n";
@@ -369,9 +371,9 @@ function enkeltpost_func($atts) {
 		$bibsysbestand = get_option('wl_ils_option_bibsysbestand' , '0');
 		if ($bibsysbestand == "1") { // bare hvis hake for bestand i Bibsys er valgt!
 			if ($ledige > 0) {
-				$postout .= '<span class="green"><strong>Ledig!</strong></span><br><br>' . "\n";
+				$postout .= '<img src="' . ilsdot("green") . '" alt="Ledig!" />&nbsp;Ledig!<br><br>' . "\n";
 			} else {
-				$postout .= '<span class="red"><strong>Ingen ledige...</strong></span><br><br>' . "\n";
+				$postout .= '<img src="' . ilsdot("red") . '" alt="Ingen ledige!" />&nbsp;Ingen ledige...<br><br>' . "\n";
 			}
 		}	
 		
@@ -388,7 +390,7 @@ function enkeltpost_func($atts) {
 		// EKSPERIMENTELL TAB-LØSNING
 
 		$postout .= '<div class="tabs">' . "\n";
-		$postout .= '<ul class="tab-links">' . "\n";
+		$postout .= '<ul class="tab-links" style="padding: 0;">' . "\n";
 		$postout .= '<li class="active"><a href="#tab1">Eksemplarer</a></li>' . "\n";
 		$postout .= '<li><a href="#tab2">Beskrivelse</a></li>' . "\n";
 		$postout .= '<li><a href="#tab3">Flere opplysninger</a></li>' . "\n";
@@ -400,19 +402,23 @@ function enkeltpost_func($atts) {
 	
 		if ((isset($treff['bestand'])) && (is_array($treff['bestand']))) { // bare hvis vi har bestandinfo
 			foreach ($treff['bestand'] as $bestand) {
-				$postout .= $bestand->institution;
-				if (isset($bestand->collection)) {
-					$postout .= '&nbsp/&nbsp' . $bestand->collection;
-				}
-				if (isset($bestand->callnumber)) {
-					$postout .= '&nbsp/&nbsp' . $bestand->callnumber;
-				}
-				$postout .= ' : ';
-				$postout .= "<strong>" . bestandsinfo ($bestand->circulationStatus , $bestand->useRestriction) . "</strong>"; // status, restriction
-				if (($bestand->circulationStatus == "4") || ($bestand->circulationStatus == "5")) { // UTLÅNT
-					setlocale (LC_TIME , "nb_NO"); // norsk dato
-					$postout .= " til " . strftime("%e. %B %G" , strtotime($bestand['y']));
-				}
+				if ($bestand->collection == "NB/DIG nbdigi") {
+					$postout .= 'Boken er tilgjengelig digitalt. Klikk p&aring; knappen "Les online" for &aring; lese den!';
+				} else {
+					$postout .= $bestand->institution;
+					if (isset($bestand->collection)) {
+						$postout .= '&nbsp/&nbsp' . $bestand->collection;
+					}
+					if (isset($bestand->callnumber)) {
+						$postout .= '&nbsp/&nbsp' . $bestand->callnumber;
+					}
+					$postout .= ' : ';
+					$postout .= "<strong>" . bestandsinfo ($bestand->circulationStatus , $bestand->useRestriction) . "</strong>"; // status, restriction
+					if (($bestand->circulationStatus == "4") || ($bestand->circulationStatus == "5")) { // UTLÅNT
+						setlocale (LC_TIME , "nb_NO"); // norsk dato
+						$postout .= " til " . strftime("%e. %B %G" , strtotime($bestand['y']));
+					}
+				}	
 			$postout .= "<br>\n";
 			}
 		$postout .= '</p>' . "\n";
@@ -547,9 +553,9 @@ function enkeltpost_func($atts) {
 		$bibsysbestand = get_option('wl_ils_option_bibsysbestand' , '0');
 		if ($bibsysbestand == "1") { // bare hvis hake for bestand i Bibsys er valgt!
 			if ($ledige > 0) {
-				$postout .= '<span class="green"><strong>Ledig!</strong></span><br><br>' . "\n";
+				$postout .= '<img src="' . ilsdot("green") . '" alt="Ledig!" />&nbsp;Ledig!<br><br>' . "\n";
 			} else {
-				$postout .= '<span class="red"><strong>Ingen ledige...</strong></span><br><br>' . "\n";
+				$postout .= '<img src="' . ilsdot("red") . '" alt="Ingen ledige!" />&nbsp;Ingen ledige...<br><br>' . "\n";
 			}
 		}	
 		
@@ -963,7 +969,6 @@ if ($post_query = get_posts($args)) {
     </div>
 <?php
 }
-
 
 
 
