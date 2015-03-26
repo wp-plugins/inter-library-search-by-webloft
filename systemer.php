@@ -87,10 +87,7 @@ function bibliofil_sok($url, $posisjon) {
 	
 	// Vi må slenge på posisjon i URL-en
 	$url = $url . "&startRecord=" . $posisjon;
-//echo "<h1>LESER SRU DATAFIL med URL " . $url . "</h1>";
 	$sru_datafil = get_content($url);
-//echo "<h1>" . $sru_datafil . "</h1>";
-//echo "<h1>" . microtime(true) . "</h1>";
 	$sru_data    = simplexml_load_string($sru_datafil);
 	
 	$namespaces = $sru_data->getNameSpaces(true);
@@ -123,6 +120,12 @@ function bibliofil_sok($url, $posisjon) {
 		
 		// initialize variables
 		
+
+		if ($record->getField("001")) {
+			$identifier = $record->getField("001");
+			$treff[$hitcounter]['identifier'] = trim(substr($identifier, 5)); // fjerne feltkoden i starten
+		}
+
 		if ($record->getField("996")) {
 			$permalink = $record->getField("996")->getSubfield("u");
 			$permalink = substr($permalink, 5); // fjerne feltkoden i starten

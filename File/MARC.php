@@ -40,14 +40,14 @@
  */
 
 require_once 'PEAR/Exception.php';
-require_once 'File/MARCBASE.php';
-require_once 'File/MARC/Record.php';
-require_once 'File/MARC/Field.php';
-require_once 'File/MARC/Control_Field.php';
-require_once 'File/MARC/Data_Field.php';
-require_once 'File/MARC/Subfield.php';
-require_once 'File/MARC/Exception.php';
-require_once 'File/MARC/List.php';
+require_once 'MARCBASE.php';
+require_once 'MARC/Record.php';
+require_once 'MARC/Field.php';
+require_once 'MARC/Control_Field.php';
+require_once 'MARC/Data_Field.php';
+require_once 'MARC/Subfield.php';
+require_once 'MARC/Exception.php';
+require_once 'MARC/List.php';
 
 // {{{ class File_MARC
 /**

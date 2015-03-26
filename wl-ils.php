@@ -3,7 +3,7 @@
 Plugin Name: ILS Search by Webloft
 Plugin URI: http://www.webekspertene.no/
 Description: Interlibrary search for your Wordpress site! NORWEGIAN: Setter inn s&oslash;kefelt som lar deg s&oslash;ke i mange forskjellige bibliotekssystemer.
-Version: 1.2.1
+Version: 2.0
 Author: H&aring;kon Sundaune / Webekspertene
 Author URI: http://www.webekspertene.no/
 */
@@ -96,9 +96,11 @@ function enkeltpost_func($atts) {
 
 	wp_enqueue_style( 'wl_ils-enkeltpost', plugins_url( '/enkeltpost.css', __FILE__ ), false, '1.0', 'all' );
 	wp_enqueue_script('wl_ils-tabs-script', plugins_url( 'js/tabs.js', __FILE__ ), array('jquery') );
+	wp_enqueue_script('wl_ils-fbshare-script', plugins_url( 'js/fbShare.js', __FILE__ ), array('jquery') );
 
-	require_once dirname(__FILE__) . '/includes/functions.php';
-
+	require_once dirname(__FILE__) . '/functions.php';
+	require_once dirname(__FILE__) . '/systemer.php';
+	
 	$info = stristr($_SERVER['REQUEST_URI'] , "enkeltpostinfo="); // fra og med "enkeltpost="
 	if (stristr($info , "&")) { 
 		$info = stristr($info , "&" , TRUE); // men bare fram til "&" hvis det finnes
@@ -106,12 +108,27 @@ function enkeltpost_func($atts) {
 	$info = str_replace ("&" , "" , $info); // fjern &
 	$info = str_replace ("enkeltpostinfo=" , "" , $info); // fjern det andre
 
+	$system = stristr($_SERVER['REQUEST_URI'] , "system="); // fra og med "system="
+	if (stristr($system , "&")) { 
+		$system = stristr($system , "&" , TRUE); // men bare fram til "&" hvis det finnes
+	}
+	$system = str_replace ("&" , "" , $system); // fjern &
+	$system = str_replace ("system=" , "" , $system); // fjern det andre
+	$system = strtolower($system);
 
 	if (isset($info)) {
 
 
 //************** VISER ENKELPOST ***************
-	$treff = unserialize(base64_decode($info));
+
+	if ($system == "koha") { // hvis Koha har vi fått all info i query string
+		$treff = unserialize(base64_decode($info));
+	} else { // Ikke koha, vi må gjøre oppslag
+		$enkeltpostinfo = unserialize(base64_decode($info));
+		$treff = hent_enkeltpost ($enkeltpostinfo['bibkode'], $system, $enkeltpostinfo['postid']);
+		$treff = hente_omslag ($treff); // legger til omslag
+		$treff = krydre_some ($treff); // legger til Twitt og face
+	}	
 
 	$postout = '<div class="enkeltpostvisning">' . "\n";
 
@@ -124,6 +141,16 @@ function enkeltpost_func($atts) {
 		} else {
 			$postout .= '<img src="' . plugins_url( 'icons/ikke_digital.jpg', __FILE__ ) . '" alt="' . $treff['tittelinfo'] . '" />' . "\n";
 		}
+		$postout .= "<br>\n";
+
+		$postout .= '<a target="_blank" href="https://twitter.com/intent/tweet?url=' . urlencode(plugins_url( 'gotourn.php', __FILE__ ) . "?params=" . $treff['facebook']) . '&via=bibvenn&text=' . htmlspecialchars($treff['twitter']) . '"><img style="width: 20px; height: 20px;" src="' . twitter_ikon() . '" alt="Del på Twitter" /></a>';
+
+		$postout .= "&nbsp;&nbsp;\n";
+
+		$postout .= "<a target=\"_self\" href=\"javascript:fbShare('" . plugins_url( 'gotourn.php', __FILE__ ) . "?params=" . $treff['facebook'] . "', 700, 350)\"><img style=\"width: 50px; height: 21px;\" src=\"" . facebook_ikon() . "\" alt=\"Facebook-deling\" /></a>";
+
+
+
 		$postout .= '</div>' . "\n";
 
 		$postout .= '<div class="infocontainer">' . "\n";
@@ -154,6 +181,7 @@ function enkeltpost_func($atts) {
 		if ($utgitt != "") {
 			$postout .= '<strong>Utgitt : </strong>' . $utgitt . "<br>\n";
 		}
+
 		if ((isset($treff['isbn'])) && ($treff['isbn'] != "")) {
 			$postout .= '<strong>ISBN : </strong>' . $treff['isbn'] . "<br>\n";
 		}
@@ -234,6 +262,11 @@ function enkeltpost_func($atts) {
 		if ((isset($treff['beskrivelse'])) && ($treff['beskrivelse'] != "")) {
 			$postout .= '<p>' . $treff['beskrivelse'] . '</p>' . "\n";
 		}
+
+		if ((isset($treff['omfang'])) && (trim($treff['omfang']) != "")) {
+			$postout .= '<strong>Omfang: </strong>' . $treff['omfang'] . "<br>\n";
+		}
+
 		$postout .= '</div>' . "\n";
  
 
@@ -318,6 +351,14 @@ function enkeltpost_func($atts) {
 		} else {
 			$postout .= '<img src="' . plugins_url( 'icons/ikke_digital.jpg', __FILE__ ) . '" alt="' . $treff['tittelinfo'] . '" />' . "\n";
 		}
+		$postout .= "<br>\n";
+
+		$postout .= '<a target="_blank" href="https://twitter.com/intent/tweet?url=' . urlencode(plugins_url( 'gotourn.php', __FILE__ ) . "?params=" . $treff['facebook']) . '&via=bibvenn&text=' . htmlspecialchars($treff['twitter']) . '"><img style="width: 20px; height: 20px;" src="' . twitter_ikon() . '" alt="Del på Twitter" /></a>';
+
+		$postout .= "&nbsp;&nbsp;\n";
+
+		$postout .= "<a target=\"_self\" href=\"javascript:fbShare('" . plugins_url( 'gotourn.php', __FILE__ ) . "?params=" . $treff['facebook'] . "', 700, 350)\"><img style=\"width: 50px; height: 21px;\" src=\"" . facebook_ikon() . "\" alt=\"Facebook-deling\" /></a>";
+
 		$postout .= '</div>' . "\n";
 
 		$postout .= '<div class="infocontainer">' . "\n";
@@ -433,6 +474,11 @@ function enkeltpost_func($atts) {
 			$postout .= $treff['beskrivelse'] . '<br>' . "\n";
 		}
 
+
+		if ((isset($treff['omfang'])) && (trim($treff['omfang']) != "")) {
+			$postout .= '<strong>Omfang: </strong>' . $treff['omfang'] . "<br>\n";
+		}
+
 		if (isset($treff['medarbeidere'])) {
 			if (is_array($treff['medarbeidere'])) {
 				$medarbeidere = implode (". " , $treff['medarbeidere']);
@@ -541,24 +587,8 @@ function enkeltpost_func($atts) {
 
 		$postout .= '<br style="clear: both;">' . "\n";
 		
-		$ledige = 0;
-		if ((isset($treff['bestand'])) && (is_array($treff['bestand']))) {
-			foreach ($treff['bestand'] as $bestand) { // Noen ledige?
-				if ($bestand->circulationStatus == "0") {
-					$ledige++;
-				}
-			}
-		}
-		
-		$bibsysbestand = get_option('wl_ils_option_bibsysbestand' , '0');
-		if ($bibsysbestand == "1") { // bare hvis hake for bestand i Bibsys er valgt!
-			if ($ledige > 0) {
-				$postout .= '<img src="' . ilsdot("green") . '" alt="Ledig!" />&nbsp;Ledig!<br><br>' . "\n";
-			} else {
-				$postout .= '<img src="' . ilsdot("red") . '" alt="Ingen ledige!" />&nbsp;Ingen ledige...<br><br>' . "\n";
-			}
-		}	
-		
+		// Kode for bestand her er slettet - vi har ikke bestandsinfo i Koha
+
 		if (isset($treff['fulltekst'])) { // finnes den på nett?
 			$postout .= "<input class=\"onlineknapp\" type=\"button\" value=\"Les p&aring; nett\" onClick=\"location.href='" . $treff['fulltekst'] . "'\">\n";
 		}

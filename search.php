@@ -2,12 +2,12 @@
 
 $reglitre_debug = 0; // Sett til 1 for debug
 
-
+/*
 // turn on for debug
 ini_set('display_startup_errors',1);
 ini_set('display_errors',1);
 error_reporting(-1);
-
+*/
 
 /*
 URL til testdata som funker
@@ -23,25 +23,13 @@ http://semlabs.co.uk/journal/object-oriented-curl-class-with-multi-threading
 
 */
 
-function bibnr_to_name($bibnr)
-{
-	include("serverliste.php");
-	foreach ($bibliotek as $ettbibliotek) {
-		$temp = explode("|x|", $ettbibliotek);
-		if ($temp[1] == $bibnr) { // hvis nummer stemmer
-			return ($temp[0]); // returner navn
-		}
-	}
-	return false;
-}
-
 
 $omslagsserver = "http://bokforsider.webloft.no";
 
 $time_start = microtime(true);
 
-require_once("includes/systemer.php"); // forskjellige bib.systemers måte å søke på
-require_once("includes/functions.php"); // funksjoner vi har bruk for
+require_once("systemer.php"); // forskjellige bib.systemers måte å søke på
+require_once("functions.php"); // funksjoner vi har bruk for
 
 $mittbibliotek   = stripslashes(strip_tags($_REQUEST['mittbibliotek']));
 if (isset($_REQUEST['enkeltposturl'])) {
@@ -152,14 +140,15 @@ $singlehtml .= 'omfangString' . "\n";
 $singlehtml .= 'deweyString' . "\n";
 $singlehtml .= '</p>' . "\n";
 $singlehtml .= '</td>' . "\n";
-$singlehtml .= '<td class="row-pendelString" style="text-align: center;">' . "\n";
 if ($mittsystem != 'koha') { // koha har ikke materialtype, da dropper vi denne 
+	$singlehtml .= '<td class="row-pendelString" style="text-align: center;">' . "\n";
 	$singlehtml .= '<img class="materialtype" src="icons/materialtypeString.png" alt="materialtypeString" /><br>' . "\n";
-	$singlehtml .= '<span class="materialtype">materialtypeString</span>';
+	$singlehtml .= '<span class="materialtype">materialtypeString</span>' . "\n";
+	$singlehtml .= 'onlineString' . "\n";
+	$singlehtml .= 'bestandString' . "\n";
+	$singlehtml .= '</td>' . "\n";
 }
-$singlehtml .= 'onlineString';
-$singlehtml .= 'bestandString';
-$singlehtml .= '</td></tr>' . "\n\n";
+$singlehtml .= '</tr>' . "\n\n";
 
 // OK, skru sammen URL for søk
 
@@ -271,6 +260,8 @@ if ($antallfunnet > 0) { // kan være tom
 //**********************************************************************************
 // Vi må gå gjennom 'HTTP_REFERER' for å finne enkeltposturl
 
+// OBS! Koha kan ikke bruke enkel, ny måte for vi har ikke unik post-ID som kan søkes opp
+
 if (stristr($_SERVER['HTTP_REFERER'] , "enkeltposturl")) { // Vi har det i referer, overstyrer den vi hadde
 	$dump = stristr ($_SERVER['HTTP_REFERER'] , "enkeltposturl="); // fra enkelposturl og ut;
 	if (stristr("&" , $dump)) { // flere vars?
@@ -286,11 +277,20 @@ if (stristr($_SERVER['HTTP_REFERER'] , "enkeltposturl")) { // Vi har det i refer
 if ((isset($enkeltposturl)) && ($enkeltposturl != "")) { // det finnes en url til side hvor enkeltposter skal vises
 	foreach ($treffliste as $mangetreff => &$etttreff) { // for hvert treff i trefflista
 		$etttreff['biblioteksystem'] = $mittsystem;
-		$treffinfo             = base64_encode(serialize($etttreff));
+
+		if ($mittsystem == "koha") { // Hvis koha - pøs all treffinfo inn i URL
+			$treffinfo             = base64_encode(serialize($etttreff));
+		} else { // men hvis ikke sender vi postID, bibtype, avdelingskode
+			$enkelinfo['bibsystem'] = $mittsystem;
+			$enkelinfo['postid'] = $etttreff['identifier'];
+			$enkelinfo['bibkode'] = $minbibkode;
+			$treffinfo             = base64_encode(serialize($enkelinfo));
+		}
+
 		if(stristr($enkeltposturl , "?")) { // Har allerede query variables
-			$etttreff['permalink'] = $enkeltposturl . "&enkeltpostinfo=" . $treffinfo;
+			$etttreff['permalink'] = $enkeltposturl . "&system=" . $mittsystem . "&enkeltpostinfo=" . $treffinfo;
 		} else { // Dette er den første
-			$etttreff['permalink'] = $enkeltposturl . "?enkeltpostinfo=" . $treffinfo;
+			$etttreff['permalink'] = $enkeltposturl . "?system=" . $mittsystem . "&enkeltpostinfo=" . $treffinfo;
 		}
 	}
 }

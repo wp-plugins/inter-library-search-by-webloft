@@ -25,7 +25,7 @@ if (trim($enkeltpost) != "") {
 }
 
 
-echo "<form target=\"_self\" action=\"" . $resultatperma . "\" method=\"POST\">\n";
+echo "<form target=\"_self\" action=\"" . $resultatperma . "\" method=\"GET\">\n";
 echo "<input type=\"text\" id=\"search\" name=\"webloftsok_query\" placeholder=\"Søkeord...\" accept-charset=\"utf-8\" />";	 
 
 echo "</form>";

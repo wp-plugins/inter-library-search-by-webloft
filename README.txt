@@ -3,7 +3,7 @@ Contributors: sundaune
 Tags: bibliotek, katalog, inter library search, search, søk, søking, søkemotor, bibliotekkatalog, bibliofil, bibsys, koha, metasøk, library, bibvenn, webekspertene, webløft, webloft, e-bok, ebok, e-book, e-books
 Requires at least: 4.0
 Tested up to: 4.1
-Stable tag: 1.2.1
+Stable tag: 2.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -13,7 +13,7 @@ Search different library catalogs from within your own site. Norwegian: Søk i b
 
 This plugin enables a shortcode that lets you insert a search form to search the library catalogue of your choice - and the hits are displayed inline in your own site. You also have the option to display single posts on the page or post of your liking, as well as inserting the search form in the form of a widget anywhere on your site and sending the results to the post or page you prefer. 
 
-Custom options include whether to search for book covers and check item availability on the fly and. The output is easily customizable (if you know CSS) by editing the included style sheets. 
+Custom options include whether to search for book covers and check item availability on the fly. The output is easily customizable (if you know CSS) by editing the included style sheets. 
 
 The plugin currently supports Bibsys, Bibliofil and Koha.
 
@@ -125,6 +125,13 @@ NORWEGIAN:
 
 == Change log ==
 
+= 1.3 =
+
+* Bugfix: Widget wasn't passing search query along to the search page
+* Feature: Added Twitter and Facebook share buttons on single items
+* Feature: Now possible to link directly to single items from the outside
+* Bugfix: URI sometimes too long for browser when sending availability data in the query string (414 error)
+
 = 1.2 = 
 
 * A LOT of additional info on each item (020$b,082$a,100$d,245$c,300$a/b,500$a,505$a,511$a,574$a,650$a,740$a etc.) 
@@ -142,6 +149,13 @@ NORWEGIAN:
 * First version
 
 NORWEGIAN:
+
+= 1.3 = 
+
+* Bugfix: Søkestrengen ble ikke med over fra widget til søkeside
+* Forbedring: Lagt til Twitter- og Facebook-knapper for å dele enkeltposter
+* Forbedring: Nå kan du lenke direkte til sider med enkeltposter utenfra
+* Bugfix: URI-en ble noen ganger for lang for nettleseren når bestandsdata ble sendt meg URL-en (414-feil)
 
 = 1.2 =
 
@@ -161,8 +175,8 @@ NORWEGIAN:
 
 == Upgrade Notice ==
 
-The search is behaving better, yielding far mor precise results. And it looks prettier, too!
+Share on Twitter and Facebook! Link to single posts! Hooray!!
 
 NORWEGIAN:
 
-Søket oppfører seg bedre og gir mer presise resultater. Og det ser bedre ut også!
+Del på Twitter og Facebook! Lenk til enkeltposter! Hurra!!
