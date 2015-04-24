@@ -113,6 +113,14 @@ if ($mittsystem == 'bibliofil') { // frasesøk i Bibliofil
 	$sokeord = str_replace(" ", "+", trim($sokeord)); // kan ikke ha mellomrom i URL
 }
 
+if ($mittsystem == 'tidemann') { // frasesøk i Tidemann
+	if (stristr($sokeord, "\"")) {
+		$sokeord = str_replace("\"", "", $sokeord); // fjerne anførsel
+	}
+	$sokeord = str_replace(" ", "+AND+", trim($sokeord)); // Dette er semi-frasesøk
+	$sokeord = str_replace(" ", "+", trim($sokeord)); // kan ikke ha mellomrom i URL
+}
+
 if ($mittsystem == 'koha') { // frasesøk i Koha
 	if (stristr($sokeord, "\"")) {
 		$sokeord   = str_replace("\"", "", $sokeord); // fjerne anførsel
@@ -140,7 +148,7 @@ $singlehtml .= 'omfangString' . "\n";
 $singlehtml .= 'deweyString' . "\n";
 $singlehtml .= '</p>' . "\n";
 $singlehtml .= '</td>' . "\n";
-if ($mittsystem != 'koha') { // koha har ikke materialtype, da dropper vi denne 
+if (($mittsystem != 'koha') && ($mittsystem != 'tidemann')) { // koha og tidemann har ikke materialtype, da dropper vi denne 
 	$singlehtml .= '<td class="row-pendelString" style="text-align: center;">' . "\n";
 	$singlehtml .= '<img class="materialtype" src="icons/materialtypeString.png" alt="materialtypeString" /><br>' . "\n";
 	$singlehtml .= '<span class="materialtype">materialtypeString</span>' . "\n";
@@ -151,6 +159,13 @@ if ($mittsystem != 'koha') { // koha har ikke materialtype, da dropper vi denne
 $singlehtml .= '</tr>' . "\n\n";
 
 // OK, skru sammen URL for søk
+
+if ($mittsystem == 'tidemann') {
+
+	$url          = $minserver . "?version=1.2&operation=searchRetrieve&maximumRecords=" . $makstreff . "&recordSchema=marcxchange&query=" . $sokeord;
+	$treffliste   = tidemann_sok($url, $posisjon);
+	$antallfunnet = tidemann_antalltreff($url);
+}
 
 if ($mittsystem == 'bibliofil') {
 
@@ -253,7 +268,6 @@ if ($antallfunnet > 0) { // kan være tom
 	
 } // slutt på sjekk om antallfunnet > 0
 
-//domp ($treffliste);
 
 //**********************************************************************************
 // Hvis vi skal vise poster på egne sider må vi fikse alle permalenkene
@@ -277,7 +291,6 @@ if (stristr($_SERVER['HTTP_REFERER'] , "enkeltposturl")) { // Vi har det i refer
 if ((isset($enkeltposturl)) && ($enkeltposturl != "")) { // det finnes en url til side hvor enkeltposter skal vises
 	foreach ($treffliste as $mangetreff => &$etttreff) { // for hvert treff i trefflista
 		$etttreff['biblioteksystem'] = $mittsystem;
-
 		if ($mittsystem == "koha") { // Hvis koha - pøs all treffinfo inn i URL
 			$treffinfo             = base64_encode(serialize($etttreff));
 		} else { // men hvis ikke sender vi postID, bibtype, avdelingskode
@@ -460,23 +473,23 @@ if ($antallfunnet > 0) { // kan være tom
 			$bestandhtml = "<br>\n";
 			if ($tilgjengelig > 0) {
 				$bestandhtml .= "<div class=\"tilgang_boks\">";
+				$bestandhtml .= "Ledig&nbsp;:&nbsp;" . $tilgjengelig . "<br>\n";
 				$bestandhtml .= "<img src=\"" . ilsdot("green") . "\" alt=\"Grønn dott\" />";
-				$bestandhtml .= "<p>Ledig&nbsp;:&nbsp;" . $tilgjengelig . "</p>\n";
 				$bestandhtml .= "</div>\n";
 			} elseif (($tilgjengelig == 0) && (($begrenset + $utlant) > 0)) {
 				$bestandhtml .= "<div class=\"tilgang_boks\">";
+				$bestandhtml .= "Utlånt el.l.&nbsp;:&nbsp;" . ($begrenset + $utlant) . "<br>\n";
 				$bestandhtml .= "<img src=\"" . ilsdot("orange") . "\" alt=\"Orange dott\" />";
-				$bestandhtml .= "<p>Utlånt el.l.&nbsp;:&nbsp;" . ($begrenset + $utlant) . "</p>\n";
 				$bestandhtml .= "</div>\n";
 			} elseif ($utilgjengelig > 0) { // utilgjengelig
 				$bestandhtml .= "<div class=\"tilgang_boks\">";
+				$bestandhtml .= "Ikke ledig&nbsp;:&nbsp;" . $utilgjengelig . "<br>\n";
 				$bestandhtml .= "<img src=\"" . ilsdot("red") . "\" alt=\"Rød dott\" />";
-				$bestandhtml .= "<p>Ikke ledig&nbsp;:&nbsp;" . $utilgjengelig . "</p>\n";
 				$bestandhtml .= "</div>\n";
 			} else {
 				$bestandhtml .= "<div class=\"tilgang_boks\">";
-				$bestandhtml .= "<img src=\"" . ilsdot("red") . "\" alt=\"Rød dott\" />";
-				$bestandhtml .= "<p>Uklar bestand!</p>\n";
+				$bestandhtml .= "Uklar bestand!<br>\n";
+				$bestandhtml .= "<img src=\"" . ilsdot("orange") . "\" alt=\"Orange dott\" />";
 				$bestandhtml .= "</div>\n";
 			}		
 		}
@@ -534,23 +547,23 @@ if ($antallfunnet > 0) { // kan være tom
 
 			if ($tilgjengelig > 0) {
 				$bestandhtml .= "<div class=\"tilgang_boks\">";
+				$bestandhtml .= "Ledig&nbsp;:&nbsp;" . $tilgjengelig . "<br>\n";
 				$bestandhtml .= "<img src=\"" . ilsdot("green") . "\" alt=\"Grønn dott\" />";
-				$bestandhtml .= "<p>Ledig&nbsp;:&nbsp;" . $tilgjengelig . "</p>\n";
 				$bestandhtml .= "</div>\n";
 			} elseif (($tilgjengelig == 0) && (($begrenset + $utlant) > 0)) {
 				$bestandhtml .= "<div class=\"tilgang_boks\">";
+				$bestandhtml .= "Utlånt el.l.&nbsp;:&nbsp;" . ($begrenset + $utlant) . "<br>\n";
 				$bestandhtml .= "<img src=\"" . ilsdot("orange") . "\" alt=\"Orange dott\" />";
-				$bestandhtml .= "<p>Utlånt el.l.&nbsp;:&nbsp;" . ($begrenset + $utlant) . "</p>\n";
 				$bestandhtml .= "</div>\n";
 			} elseif ($utilgjengelig > 0) { // utilgjengelig
 				$bestandhtml .= "<div class=\"tilgang_boks\">";
+				$bestandhtml .= "Ikke ledig&nbsp;:&nbsp;" . $utilgjengelig . "<br>\n";
 				$bestandhtml .= "<img src=\"" . ilsdot("red") . "\" alt=\"Rød dott\" />";
-				$bestandhtml .= "<p>Ikke ledig&nbsp;:&nbsp;" . $utilgjengelig . "</p>\n";
 				$bestandhtml .= "</div>\n";
 			} else {
 				$bestandhtml .= "<div class=\"tilgang_boks\">";
-				$bestandhtml .= "<img src=\"" . ilsdot("red") . "\" alt=\"Rød dott\" />";
-				$bestandhtml .= "<p>Uklar bestand!</p>\n";
+				$bestandhtml .= "Uklar bestand!<br>\n";
+				$bestandhtml .= "<img src=\"" . ilsdot("orange") . "\" alt=\"Orange dott\" />";
 				$bestandhtml .= "</div>\n";
 			}
 		}

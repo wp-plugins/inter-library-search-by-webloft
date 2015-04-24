@@ -3,7 +3,7 @@ Contributors: sundaune
 Tags: bibliotek, katalog, inter library search, search, søk, søking, søkemotor, bibliotekkatalog, bibliofil, bibsys, koha, metasøk, library, bibvenn, webekspertene, webløft, webloft, e-bok, ebok, e-book, e-books
 Requires at least: 4.0
 Tested up to: 4.1
-Stable tag: 2.0
+Stable tag: 2.0.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -125,6 +125,12 @@ NORWEGIAN:
 
 == Change log ==
 
+= 2.0.1 =
+
+* Initial public release
+* Support for Tidemann libraries added
+* Bugfix: Description in Facebook share window was empty
+
 = 1.3 =
 
 * Bugfix: Widget wasn't passing search query along to the search page
@@ -149,6 +155,12 @@ NORWEGIAN:
 * First version
 
 NORWEGIAN:
+
+= 2.0.1 =
+
+* Første offentlige slipp
+* Lagt til støtte for Tidemann
+* Bugfix: Beskrivelse kom ikke med i delingsvinduet for Facebook
 
 = 1.3 = 
 
@@ -175,8 +187,8 @@ NORWEGIAN:
 
 == Upgrade Notice ==
 
-Share on Twitter and Facebook! Link to single posts! Hooray!!
+Now: With Tidemann support!
 
 NORWEGIAN:
 
-Del på Twitter og Facebook! Lenk til enkeltposter! Hurra!!
+Nå også med Tidemann-støtte!
