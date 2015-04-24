@@ -90,8 +90,7 @@ function ilsdot($color) {
 
 if ($color == "green") {
 
-return ("data:image/png;base64,
-iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wMZDBIQKVT/TAAAAUJJREFUGNN9kE8ogwEYh3/v+32bGa1NDKsVO7FRi4iD4uZIcXCTKNnBGTni4uDiiAOS4y4rbv4c5LDEZVlbitlqpk1r9tm+73UYOTDP9fn1OzwkIgAAnDxe7d0H47lnIvQ5fQHfZKe9vaKoMpq/2DiOnRb1D110ACZWrWrten9grmMMAAPYvN0/jIay2luxrJWMcskoF0rFl/fMyvX2WTIMgF+13NbdUb5UIGIiIhCBiIhISRcya+FdAHyZuknkU0SMXxAr58lwopDmu0yMSEEVNF2L557YgIH/IAPCXodHRK82MSmqx+bioVa/09oo8sefiD7Q3O2ua2GnpWHBO1GrWkQMgXxrEdEbLI5l/8xXp9We2fG2EZu53swmJmZii2p21NiX/NOj7sGf4gB2IsGDaCiSfTCx0tvkXeyaGnb1VtQn4BeAqCieO4AAAAAASUVORK5CYII=");
+return ("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wMeDCwqM0oFOgAAAR5JREFUGNNj/PvvLwMDAwMDw5c/X/e+PHjryz0OZnZDAV0bEQsGGGCBUN03pyzbvPzzrQ///zMwMDAwszGJOki1OdTbi1oxMDAw/v33N/9C5e4Vu77e/8SACoQtxTsjW1zFHZiOvz29Z/VuTBUMDAxvj7+s29P6+/8f5j8hbLd33fj/9z8DNvDj1XdNU01mFjPOb/c///+HXRETCxOXHj/Tny+////HrgICPv/+zMSrKsDIzIRHkSafGlOQmi8zJzMuFRwSXJ4SLkypSrGidpKMzIxYVIhzWgXZqvAoMv799/f2l7txG9JfHXz+9+tviDQjIyO7GKdWqP46q4XQwGRgYPj858uUO7M3ntzy+dZHZg5mIXOxHK3UEBk/iB4AvKVtzhOFGqoAAAAASUVORK5CYII=");
 
 }
 
@@ -257,6 +256,12 @@ if (strtolower($bibtype) == "bibliofil") {
 	$treff[0]['biblioteksystem'] = "bibliofil";
 }
 
+if (strtolower($bibtype) == "tidemann") {
+	$url = $minserver . '?version=1.2&operation=searchRetrieve&maximumRecords=10&recordSchema=marcxchange&query=rec.identifier=' . $postid;
+	$treff = tidemann_sok($url, "1");
+	$treff[0]['biblioteksystem'] = "tidemann";
+}
+
 //		Denne URL-en søker etter post med dokid i 001:
 // https://www.ringsaker.bib.no/cgi-bin/sru?version=1.2&operation=searchRetrieve&maximumRecords=10&query=dc.identifier=/bib.identifierAuthority=local%
 
@@ -340,7 +345,7 @@ function krydre_some ($treff) { // tar et enkelt treff, legger til Twitter og Fa
 
 $params = utf8_decode($treff['tittelinfo']);
 $params .= "|x|";
-if (isset($treff['beskrivelse'])) {		
+if ((isset($treff['beskrivelse'])) && (trim($treff['beskrivelse']) != "")) {		
 	$params .= utf8_decode($treff['beskrivelse']);
 } else {
 	$params .= utf8_decode($treff['omfang']) . "  ";
