@@ -137,7 +137,7 @@ function bibliofil_sok($url, $posisjon) {
 		} else { // no permalink
 			$treff[$hitcounter]['permalink'] = "";
 		}
-
+	
 		if ($record->getField("245")) {
 			$tittel                          = $record->getField("245")->getSubfield("a");
 			$treff[$hitcounter]['tittel']    = substr($tittel, 5); // fjerne feltkoden i starten
@@ -316,7 +316,22 @@ function bibliofil_sok($url, $posisjon) {
 				$etteks[] = $ettfelt;
 				unset($ettfelt);
 			}
+
+
+			// Lese utdrag: Sjekke 856
 	
+			if ($tag == '856') {
+				foreach ($subfields->getSubfields() as $code => $value) {
+					$ettfelt[(string) $code] = substr((string) $value, 5);
+				}
+				if ((isset($ettfelt['z'])) && ($ettfelt['z'] == "Les utdrag")) {
+					if (isset($ettfelt['u'])) {
+						$treff[$hitcounter]['pdfutdrag'] = $ettfelt['u'];
+					}
+				}
+
+			}
+
 			// Dewey: Sjekke 082 $a
 
 			if ($tag == '082') {

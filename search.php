@@ -136,11 +136,13 @@ if ($mittsystem == 'koha') { // frasesøk i Koha
 $singlehtml = '<tr>' . "\n";
 $singlehtml .= '<td class="row-pendelString">' . "\n";
 if ($hamedbilder == "1") { // skal vi egentlig vise bilder i det hele tatt, sånn i følge innstillingene?
+	$singlehtml .= '<a target="_blank" href="urlString">' . "\n";
 	$singlehtml .= '<img class="omslag" src="omslagString" alt="tittelString" />' . "\n";
+	$singlehtml .= '</a>' . "\n";
 }
 $singlehtml .= '<h3><a target="_blank" href="urlString">tittelString</a> (aarString)</h3>' . "\n";
 $singlehtml .= '<span class="opphav">opphavString</span>' . "\n";
-$singlehtml .= '<p>descriptionString</p>';
+$singlehtml .= '<p>descriptionStringutdragString</p>';
 $singlehtml .= '<p>' . "\n";
 $singlehtml .= 'titteloriginalString' . "\n";
 $singlehtml .= 'isbnString' . "\n";
@@ -348,7 +350,7 @@ if ($reglitre_debug == 1) {
 if ($antallfunnet > 0) { // kan være tom
 	
 	// SKRIVE UT
-	
+
 	$pendel       = 0;
 	$treffperside = $makstreff; // mindre forvirrende! (innstilling var før maks treff å hente, ble treff per side etter hvert)
 	
@@ -572,6 +574,13 @@ if ($antallfunnet > 0) { // kan være tom
 		
 		if ((isset($bestandhtml)) && ($bestandhtml != '')) {
 			$htmlout = @str_replace('bestandString', $bestandhtml, $htmlout);
+		}
+		
+		if ((isset($treff['pdfutdrag'])) && ($treff['pdfutdrag'] != "")) {
+			$utdraghtml = '[<a target="_blank" href="' . $treff['pdfutdrag'] . '"><strong>Les utdrag</strong></a>]' . "\n";			
+			$htmlout = @str_replace('utdragString', $utdraghtml , $htmlout);
+		} else {
+			$htmlout = @str_replace('utdragString', "" , $htmlout);
 		}
 		
 		$htmlout = @str_replace('pendelString', $pendel, $htmlout);

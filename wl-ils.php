@@ -3,7 +3,7 @@
 Plugin Name: ILS Search by Webloft
 Plugin URI: http://www.webekspertene.no/
 Description: Interlibrary search for your Wordpress site! NORWEGIAN: Setter inn s&oslash;kefelt som lar deg s&oslash;ke i mange forskjellige bibliotekssystemer.
-Version: 2.0.1
+Version: 2.0.2
 Author: H&aring;kon Sundaune / Webekspertene
 Author URI: http://www.webekspertene.no/
 */
@@ -19,7 +19,7 @@ wp_enqueue_script('wl_ils-onload-script', plugins_url( 'js/hideonload.js', __FIL
 wp_enqueue_style( 'wl_ils', plugins_url( '/wl-ils.css', __FILE__ ), false, '1.0', 'all' );
 
 extract(shortcode_atts(array(
-	'mittbibliotek' => '2020000'	
+	'mittbibliotek' => '0'	
    ), $atts));
 
 $enkeltpost = get_option('wl_ils_option_enkeltpost' , '');
@@ -36,12 +36,21 @@ if (isset($_REQUEST['webloftsok_query'])) {
 	$hamedsok = '';
 }
 
-if ($standardbibliotek == "0") { // Hjemmebibliotek ikke satt i Wordpress
+if ($mittbibliotek == "0") { // ikke satt i shortcode
+	if ($standardbibliotek == "0") { // ikke satt i backend
+		$brukbibliotek = "2020000"; // Akershus fylkesbib. er standard
+	} else { // satt i backend
+		$brukbibliotek = $standardbibliotek;
+	}
+} else { // satt i shortcode
 	$brukbibliotek = $mittbibliotek;
-} else { // Vi har en standard
-	$brukbibliotek = $standardbibliotek;
 }
 
+
+if (isset($_REQUEST['katalog'])) { // kan være satt i widget
+	$brukbibliotek = stripslashes(strip_tags($_REQUEST['katalog']));
+}
+	
 // lage URL i tilfelle det er lenket direkte til søkeside
 
 $frameurl = plugins_url('search.php' , __FILE__) . "?mittbibliotek=" . $brukbibliotek . "&omslagbokkilden=" . $omslagbokkilden . "&bibsysbestand=" . $bibsysbestand . "&omslagnb=" . $omslagnb . "&hamedbilder=" . $hamedbilder . "&makstreff=" . $makstreff . "&s=" . $hamedsok;
@@ -969,6 +978,7 @@ class wl_ils_widget extends WP_Widget {
 
 		$instance['resultatside'] = strip_tags($new_instance['resultatside']);
 		$instance['title'] = strip_tags($new_instance['title']);
+		$instance['katalog'] = strip_tags($new_instance['katalog']);
 
 		return $instance;
 
@@ -982,7 +992,7 @@ class wl_ils_widget extends WP_Widget {
 	public function form( $instance ) {
 
 		// Define default values for your variables
-		$defaults = array( 'resultatside' => '' , 'tittel' => 'Søk i katalogen');
+		$defaults = array( 'resultatside' => '' , 'tittel' => 'Søk i katalogen' , 'katalog' => '2020000');
 		$instance = wp_parse_args(
 			(array) $instance, $defaults
 		);
@@ -991,6 +1001,7 @@ class wl_ils_widget extends WP_Widget {
 
 		$resultatside = esc_attr($instance['resultatside']);
 		$title = esc_attr($instance['title']);
+		$katalog = esc_attr($instance['katalog']);
 
 		// Display the admin form
 		include( plugin_dir_path(__FILE__) . 'admin.php' );
@@ -1132,8 +1143,11 @@ foreach ($bibliotek as $ettbibliotek) {
 	}
 echo "<option value=\"" . $temp[1] . "\"" . $hepp . ">" . $temp[0] . "</option>\n";
 }
+echo "</select>";
+echo "<br><br><i>Denne innstillingen kan overstyres ved &aring; angi et annet bibliotek i shortcode/kortkode, f.eks. slik: <strong>[wl-ils mittbibliotek=2021900]</strong> for B&aelig;rum folkebibliotek. Du finner en oppdatert liste over bibliotek-koder ved &aring; <a target=\"_blank\" href=\"" . plugins_url( 'bibkoder.php', __FILE__ ) . "\">klikke her</a>.</i>";
+
 ?>
-				</select>
+
 <h2>Innstillinger for alle bibliotek</h2>
 <h3>Visning</h3>
 <p>

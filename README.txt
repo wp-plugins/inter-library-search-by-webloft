@@ -2,8 +2,8 @@
 Contributors: sundaune
 Tags: bibliotek, katalog, inter library search, search, søk, søking, søkemotor, bibliotekkatalog, bibliofil, bibsys, koha, metasøk, library, bibvenn, webekspertene, webløft, webloft, e-bok, ebok, e-book, e-books
 Requires at least: 4.0
-Tested up to: 4.1
-Stable tag: 2.0.1
+Tested up to: 4.2
+Stable tag: 2.0.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -53,7 +53,11 @@ To use the search function in the simplest way, just insert the following shortc
 
 [wl-ils]
 
-The search form will then be inserted, and when used the results will appear directly beneath in an automatically expanding iframe. You can also display the search form as a widget in widgetized areas of your site (side bars, header, footer etc.). In this case you have to choose which page or post to send the results to. You do this from the widget settings - Webloft ILS will automatically scan all posts and pages, and let you choose from the ones containing the [wl-ils] shortcode. 
+The search form will then be inserted, and search the library catalogue you have choosen on the settings page. If you want this particular search form to use another catalogue (this way you can have search forms for several libraries on your page), just use:
+
+[wl-ils mittbibliotek=CODE]
+
+... where CODE is taken from the table of codes available from the settings page. When the user enters a search terms and hits Enter or clicks OK, the results will appear directly beneath in an automatically expanding iframe. You can also display the search form as a widget in widgetized areas of your site (side bars, header, footer etc.). In this case you have to choose which page or post to send the results to. You do this from the widget settings - Webloft ILS will automatically scan all posts and pages, and let you choose from the ones containing the [wl-ils] shortcode. 
 
 Display of single items
 
@@ -91,7 +95,13 @@ For å bruke søkeskjemaet på enkelste måte kan du bare sette inn følgende ko
 
 [wl-ils]
 
-Da vil et søkeskjema bli satt inn, og når skjemaet sendes inn vil resultatene vises rett under, i en ifram som ekspanderer automatisk til antallet treff. Du kan også vise søkeskjemaet som en widget hvis nettstedet ditt har støtte for slike (på siden, på toppen, i bunnen osv.). Da må du i tilfelle angi hvilken side eller hvilket innlegg resultatene skal sendes til. Dete gjøres i widgetens innstillinger - Webloft ILS vil automatisk lete gjennom alle sider og innlegg for å la deg velge blant de som inneholder kortkoden [wl-ils].
+Da vil et søkeskjema bli satt inn, som søker i den bibliotekkatalogen du har angitt i innstillingene i Wordpress. Hvis du vil at dette søkeskjemaet skal søke i et annet biblioteks katalog (på denne måten kan du ha søkebokser til flere forskjellige biblioteker på nettsidene dine) kan du bare sette inn:
+
+[wl-ils mittbibliotek=KODE]
+
+... hvor KODE er hentet fra tabellen med bibliotekkoder som er tilgjengelig fra siden med innstillinger. Når brukeren skriver inn en søketerm og trykker Enter eller klikker OK vil resultatene vises rett under, i en iframe som ekspanderer automatisk til antallet treff. 
+
+Du kan også vise søkeskjemaet som en widget hvis nettstedet ditt har støtte for slike (på siden, på toppen, i bunnen osv.). Da må du i tilfelle angi hvilken side eller hvilket innlegg resultatene skal sendes til. Dete gjøres i widgetens innstillinger - Webloft ILS vil automatisk lete gjennom alle sider og innlegg for å la deg velge blant de som inneholder kortkoden [wl-ils].
 
 Visning av enkeltposter
 
@@ -125,6 +135,13 @@ NORWEGIAN:
 
 == Change log ==
 
+= 2.0.2 =
+
+* Widget: Support for choosing the library catalogue to search in on a per-widget basis
+* Shortcode: Support for specifying the library catalogue in the shortcode via the "mittbibliotek" parameter
+* Now fetches PDF excerpt from MARC 856 where available
+* Bugfix: Wrong character encoding in Facebook sharer window
+
 = 2.0.1 =
 
 * Initial public release
@@ -155,6 +172,13 @@ NORWEGIAN:
 * First version
 
 NORWEGIAN:
+
+= 2.0.2 = 
+
+* Widget: Mulighet for å velge hvilket biblioteks katalog det skal søkes i for hver enkelt widget
+* Kortkode: Mulighet for å velge bibliotek-katalog i kortkode ved hjelp av "mittbibliotek"-parameteret
+* Henter nå PDF med utdrag fra MARC-felt 856 der dette finnes
+* Bugfix: Feil tegnkoding i Facebooks delevindu
 
 = 2.0.1 =
 
