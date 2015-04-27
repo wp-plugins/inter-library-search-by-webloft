@@ -136,7 +136,9 @@ if ($mittsystem == 'koha') { // frasesøk i Koha
 $singlehtml = '<tr>' . "\n";
 $singlehtml .= '<td class="row-pendelString">' . "\n";
 if ($hamedbilder == "1") { // skal vi egentlig vise bilder i det hele tatt, sånn i følge innstillingene?
+	$singlehtml .= '<a target="_blank" href="urlString">' . "\n";
 	$singlehtml .= '<img class="omslag" src="omslagString" alt="tittelString" />' . "\n";
+	$singlehtml .= '</a>' . "\n";
 }
 $singlehtml .= '<h3><a target="_blank" href="urlString">tittelString</a> (aarString)</h3>' . "\n";
 $singlehtml .= '<span class="opphav">opphavString</span>' . "\n";

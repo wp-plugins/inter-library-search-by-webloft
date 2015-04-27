@@ -15,7 +15,7 @@ This plugin enables a shortcode that lets you insert a search form to search the
 
 Custom options include whether to search for book covers and check item availability on the fly. The output is easily customizable (if you know CSS) by editing the included style sheets. 
 
-The plugin currently supports Bibsys, Bibliofil and Koha.
+The plugin currently supports Bibsys, Bibliofil, Koha and Tidemann.
 
 NORWEGIAN:
 
@@ -23,7 +23,7 @@ Dette innstikket installerer en kortkode som lar deg sette inn et søkeskjema so
 
 Innstillingene inkluderer muligheten for å finne bokomslag forskjellige steder og å sjekke bestand for hver bok før treffene vises. Utseendet kan enkelt tilpasses (hvis du kan CSS) ved å redigere de medfølgende stilarkene. 
 
-Innstikket har for tiden støtte for Bibsys, Bibliofil og Koha.
+Innstikket har for tiden støtte for Bibsys, Bibliofil, Koha og Tidemann.
 
 == Installation ==
 
