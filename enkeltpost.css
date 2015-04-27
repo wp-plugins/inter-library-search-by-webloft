@@ -46,6 +46,10 @@
 	float: right;
 	}
 
+.infocontainer img {
+	box-shadow: none;
+	}
+
 input.onlineknapp[type=button] {
 	font-size: 1em;
 	width: 49%;

@@ -251,6 +251,12 @@ $bibliotek[] = "Sonans Drammen|x|KOHA009|x|http://sonans.bibkat.no|x|koha|x|";
 $bibliotek[] = "Stiftelsen Kirkeforskning|x|KOHA010|x|http://kifo.bibkat.no|x|koha|x|";
 $bibliotek[] = "Time kommune, skolebibliotek|x|KOHA011|x|http://time-skulebibliotek.no|x|koha|x|";
 
+
+// Tidemann OBS LØPENUMMER I FELT #2 FOR Å FÅ UNIK KODE
+
+$bibliotek[] = "Flesberg bibliotek|x|TIDEMANN001|x|http://asp.bibliotekservice.no/flesberg_sru/nome.aspx|x|tidemann|x|";
+$bibliotek[] = "Rødberg bibliotek|x|TIDEMANN002|x|http://asp.bibliotekservice.no/nuf_sru/nome.aspx|x|tidemann|x|";
+
 sort ($bibliotek);
 
 // koble bokstavkode og bibnr:

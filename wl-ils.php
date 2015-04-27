@@ -3,7 +3,7 @@
 Plugin Name: ILS Search by Webloft
 Plugin URI: http://www.webekspertene.no/
 Description: Interlibrary search for your Wordpress site! NORWEGIAN: Setter inn s&oslash;kefelt som lar deg s&oslash;ke i mange forskjellige bibliotekssystemer.
-Version: 2.0
+Version: 2.0.2
 Author: H&aring;kon Sundaune / Webekspertene
 Author URI: http://www.webekspertene.no/
 */
@@ -19,7 +19,7 @@ wp_enqueue_script('wl_ils-onload-script', plugins_url( 'js/hideonload.js', __FIL
 wp_enqueue_style( 'wl_ils', plugins_url( '/wl-ils.css', __FILE__ ), false, '1.0', 'all' );
 
 extract(shortcode_atts(array(
-	'mittbibliotek' => '2020000'	
+	'mittbibliotek' => '0'	
    ), $atts));
 
 $enkeltpost = get_option('wl_ils_option_enkeltpost' , '');
@@ -36,12 +36,21 @@ if (isset($_REQUEST['webloftsok_query'])) {
 	$hamedsok = '';
 }
 
-if ($standardbibliotek == "0") { // Hjemmebibliotek ikke satt i Wordpress
+if ($mittbibliotek == "0") { // ikke satt i shortcode
+	if ($standardbibliotek == "0") { // ikke satt i backend
+		$brukbibliotek = "2020000"; // Akershus fylkesbib. er standard
+	} else { // satt i backend
+		$brukbibliotek = $standardbibliotek;
+	}
+} else { // satt i shortcode
 	$brukbibliotek = $mittbibliotek;
-} else { // Vi har en standard
-	$brukbibliotek = $standardbibliotek;
 }
 
+
+if (isset($_REQUEST['katalog'])) { // kan være satt i widget
+	$brukbibliotek = stripslashes(strip_tags($_REQUEST['katalog']));
+}
+	
 // lage URL i tilfelle det er lenket direkte til søkeside
 
 $frameurl = plugins_url('search.php' , __FILE__) . "?mittbibliotek=" . $brukbibliotek . "&omslagbokkilden=" . $omslagbokkilden . "&bibsysbestand=" . $bibsysbestand . "&omslagnb=" . $omslagnb . "&hamedbilder=" . $hamedbilder . "&makstreff=" . $makstreff . "&s=" . $hamedsok;
@@ -131,6 +140,217 @@ function enkeltpost_func($atts) {
 	}	
 
 	$postout = '<div class="enkeltpostvisning">' . "\n";
+
+	// ************* TIDEMANN-VISNING ******************
+
+	if ($treff['biblioteksystem'] == "tidemann") {
+		$postout .= '<div class="bildecontainer">' . "\n";
+		if ((isset($treff['omslag'])) && ($treff['omslag'] != "")) { // omslag finnes
+			$postout .= '<img src="' . $treff['omslag'] . '" alt="' . $treff['tittelinfo'] . '" />' . "\n";
+		} else {
+			$postout .= '<img src="' . plugins_url( 'icons/ikke_digital.jpg', __FILE__ ) . '" alt="' . $treff['tittelinfo'] . '" />' . "\n";
+		}
+		$postout .= "<br>\n";
+
+		$postout .= '<a target="_blank" href="https://twitter.com/intent/tweet?url=' . urlencode(plugins_url( 'gotourn.php', __FILE__ ) . "?params=" . $treff['facebook']) . '&via=bibvenn&text=' . htmlspecialchars($treff['twitter']) . '"><img style="width: 20px; height: 20px;" src="' . twitter_ikon() . '" alt="Del på Twitter" /></a>';
+
+		$postout .= "&nbsp;&nbsp;\n";
+
+		$postout .= "<a target=\"_self\" href=\"javascript:fbShare('" . plugins_url( 'gotourn.php', __FILE__ ) . "?params=" . $treff['facebook'] . "', 700, 350)\"><img style=\"width: 50px; height: 21px;\" src=\"" . facebook_ikon() . "\" alt=\"Facebook-deling\" /></a>";
+
+
+
+		$postout .= '</div>' . "\n";
+
+		$postout .= '<div class="infocontainer">' . "\n";
+		$postout .= '<h2>' . str_replace (": :" , ":" , $treff['tittelinfo']) . '</h2>' . "\n";
+		$postout .= '<p>' . "\n";
+		if ((isset ($treff['forfatter'])) && ($treff['forfatter'] != "")) {
+			$postout .= '<strong>Forfatter : </strong>' . $treff['forfatter'] . '<br>' . "\n";
+		}
+
+		if ((isset ($treff['ansvarsangivelse'])) && ($treff['ansvarsangivelse'] != "")) {
+			$postout .= '<strong>Opphav : </strong>' . $treff['ansvarsangivelse'] . '<br>' . "\n";
+		}
+
+		$utgitt = '';
+		if ((isset($treff['utgitthvem'])) && (trim($treff['utgitthvem']) != "")) {
+			$utgitt = $treff['utgitthvem'];
+		} else {
+			$utgitt = "[s.n.]";
+		}
+		if ((isset($treff['utgitthvor'])) && (trim($treff['utgitthvor']) != "")) {
+			$utgitt .= ", " . $treff['utgitthvor'];
+		} else {
+			$utgitt .= ", [s.l.]";
+		}
+		if ((isset($treff['utgittaar'])) && (trim($treff['utgittaar']) != "")) {
+			$utgitt .= ", " . $treff['utgittaar'];
+		}
+		if ($utgitt != "") {
+			$postout .= '<strong>Utgitt : </strong>' . $utgitt . "<br>\n";
+		}
+
+		if ((isset($treff['isbn'])) && ($treff['isbn'] != "")) {
+			$postout .= '<strong>ISBN : </strong>' . $treff['isbn'] . "<br>\n";
+		}
+
+		$postout .= '<br style="clear: both;">' . "\n";
+
+		$ledige = 0;
+		$uklar = 0;
+		if (is_array($treff['bestand'])) {
+			foreach ($treff['bestand'] as $bestand) { // Noen ledige?
+				if ($bestand['h'] == "0") {
+					$ledige++;
+				}
+			}
+		} else {
+			$uklar = 1; // bestand er ikke array, uklar bestandsinfo
+		}
+		if ($ledige > 0) {
+			$postout .= '<img src="' . ilsdot("green") . '" alt="Ledig!" />&nbsp;Ledig!<br><br>' . "\n";
+		} else {
+			if ($uklar == 1) {
+				$postout .= '<img src="' . ilsdot("red") . '" alt="Uklar bestand" />&nbsp;Uklar bestand - kontakt biblioteket!<br><br>' . "\n";
+			} else {
+				$postout .= '<img src="' . ilsdot("red") . '" alt="Ingen ledige!" />&nbsp;Ingen ledige...<br><br>' . "\n";
+			}
+		}
+
+		if (isset($treff['fulltekst'])) { // finnes den på nett?
+			$postout .= "<input class=\"onlineknapp\" type=\"button\" value=\"Les p&aring; nett\" onClick=\"location.href='" . $treff['fulltekst'] . "'\">\n";
+		}
+		$bestilleurl = str_replace ("websok?" , "mappami?jumpmode=reservering&" , $treff['permalink']); // oh, you clever
+		if ($bestilleurl != "") {
+			$postout .= "<input class=\"bestilleknapp\" type=\"button\" value=\"Bestille/reservere\" onClick=\"location.href='" . $bestilleurl . "'\">\n";
+		}
+		$bestilleurl = ''; // må rydde opp
+		$uklar = ''; // må rydde opp
+		$postout .= '</p>' . "\n";
+		$postout .= '</div>' . "\n"; // slutt på infoboks
+
+		// EKSPERIMENTELL TAB-LØSNING
+
+		$postout .= '<div class="tabs">' . "\n";
+		$postout .= '<ul class="tab-links" style="padding: 0;">' . "\n";
+		$postout .= '<li class="active"><a href="#tab1">Eksemplarer</a></li>' . "\n";
+		$postout .= '<li><a href="#tab2">Beskrivelse</a></li>' . "\n";
+		$postout .= '<li><a href="#tab3">Flere opplysninger</a></li>' . "\n";
+		$postout .= '</ul>' . "\n";
+		 
+		$postout .= '<div class="tab-content">' . "\n";
+		$postout .= '<div id="tab1" class="tab active">' . "\n";
+	
+		if (is_array($treff['bestand'])) {
+			foreach ($treff['bestand'] as $bestand) {
+				$postout .= $bestand['bibnavn'];
+				if (isset($bestand['b'])) {
+					$postout .= '&nbsp/&nbsp' . $bestand['b'];
+				}
+				if (isset($bestand['c'])) {
+					$postout .= '&nbsp/&nbsp' . $bestand['c'];
+				}
+				$postout .= ' : ';
+				if ((!isset($bestand['h'])) || (!isset($bestand['f']))) { // sett til ukjent hvis ikke satt 
+					$bestand['h'] = "1";
+					$bestand['f'] = "-1";
+				}
+				$postout .= "<strong>" . bestandsinfo ($bestand['h'] , $bestand['f']) . "</strong>"; // status, restriction
+				if (($bestand['h'] == "4") || ($bestand['h'] == "5")) { // UTLÅNT
+					setlocale (LC_TIME , "nb_NO"); // norsk dato
+					$postout .= " til " . strftime("%e. %B %G" , strtotime($bestand['y']));
+				}
+			$postout .= "<br>\n";
+			}
+		}
+	
+		$postout .= '</div>' . "\n";
+ 
+		$postout .= '<div id="tab2" class="tab">' . "\n";
+		if ((isset($treff['beskrivelse'])) && ($treff['beskrivelse'] != "")) {
+			$postout .= '<p>' . $treff['beskrivelse'] . '</p>' . "\n";
+		}
+
+		if ((isset($treff['omfang'])) && (trim($treff['omfang']) != "")) {
+			$postout .= '<strong>Omfang: </strong>' . $treff['omfang'] . "<br>\n";
+		}
+
+		$postout .= '</div>' . "\n";
+ 
+
+		$postout .= '<div id="tab3" class="tab">' . "\n";
+		$postout .= '<p>' . "\n";		
+
+		if (isset($treff['originaltittel'])) {
+			$postout .= "<strong>Originaltittel: </strong>" . $treff['originaltittel'] . "<br>\n";
+		}
+		
+		if (is_array($treff['dewey'])) {
+			$postout .= '<strong>Dewey : </strong>';
+			$alledewey = implode (" / " , $treff['dewey']);
+			$postout .= $alledewey . "<br>\n";
+		}
+		
+		if (isset($treff['generellnote'])) {
+			if (is_array($treff['generellnote'])) {
+				$generellnote = implode (". " , $treff['generellnote']);
+			} else {
+				$generellnote = $treff['generellnote'];
+			}
+			$postout .= "<strong>Generell note: </strong>" . $generellnote . "<br>\n";
+		}
+
+		if (isset($treff['innholdsnote'])) {
+			if (is_array($treff['innholdsnote'])) {
+				$innholdsnote = implode (". " , $treff['innholdsnote']);
+			} else {
+				$innholdsnote = $treff['innholdsnote'];
+			}
+			$postout .= "<strong>Innholdsnote: </strong>" . $innholdsnote . "<br>\n";
+		}
+
+
+		if (isset($treff['medarbeidere'])) {
+			if (is_array($treff['medarbeidere'])) {
+				$medarbeidere = implode (". " , $treff['medarbeidere']);
+			} else {
+				$medarbeidere = $treff['medarbeidere'];
+			}
+			$postout .= "<strong>Medvirkende: </strong>" . $medarbeidere . "<br>\n";
+		}
+
+
+		if (isset($treff['titler'])) {
+			if (is_array($treff['titler'])) {
+				$titler = implode (" ; " , $treff['titler']);
+			} else {
+				$titler = $treff['titler'];
+			}
+			$postout .= "<strong>Tittelinformasjon: </strong>" . $titler . "<br>\n";
+		}
+
+
+		if (isset($treff['emneord'])) {
+			if (is_array($treff['emneord'])) {
+				$emneord = implode (" ; " , $treff['emneord']);
+			} else {
+				$emneord = $treff['emneord'];
+			}
+			$postout .= "<strong>Emneord: </strong>" . $emneord . "<br>\n";
+		}
+
+
+		$postout .= '</p>' . "\n";
+		$postout .= '</div>' . "\n";
+ 
+		$postout .= '</div>' . "\n";
+		$postout .= '</div>' . "\n";
+
+
+	}
+
+
 
 	// ************* BIBLIOFIL-VISNING ******************
 
@@ -308,7 +528,7 @@ function enkeltpost_func($atts) {
 			} else {
 				$medarbeidere = $treff['medarbeidere'];
 			}
-			$postout .= "<strong>Medarbeidere: </strong>" . $medarbeidere . "<br>\n";
+			$postout .= "<strong>Medvirkende: </strong>" . $medarbeidere . "<br>\n";
 		}
 
 
@@ -340,7 +560,6 @@ function enkeltpost_func($atts) {
 
 
 	}
-
 
 	// ************* BIBSYS-VISNING ******************
 
@@ -485,7 +704,7 @@ function enkeltpost_func($atts) {
 			} else {
 				$medarbeidere = $treff['medarbeidere'];
 			}
-			$postout .= "<strong>Medarbeidere: </strong>" . $medarbeidere . "<br>\n";
+			$postout .= "<strong>Medvirkende: </strong>" . $medarbeidere . "<br>\n";
 		}
 
 		if (isset($treff['generellnote'])) {
@@ -759,6 +978,7 @@ class wl_ils_widget extends WP_Widget {
 
 		$instance['resultatside'] = strip_tags($new_instance['resultatside']);
 		$instance['title'] = strip_tags($new_instance['title']);
+		$instance['katalog'] = strip_tags($new_instance['katalog']);
 
 		return $instance;
 
@@ -772,7 +992,7 @@ class wl_ils_widget extends WP_Widget {
 	public function form( $instance ) {
 
 		// Define default values for your variables
-		$defaults = array( 'resultatside' => '' , 'tittel' => 'Søk i katalogen');
+		$defaults = array( 'resultatside' => '' , 'tittel' => 'Søk i katalogen' , 'katalog' => '2020000');
 		$instance = wp_parse_args(
 			(array) $instance, $defaults
 		);
@@ -781,6 +1001,7 @@ class wl_ils_widget extends WP_Widget {
 
 		$resultatside = esc_attr($instance['resultatside']);
 		$title = esc_attr($instance['title']);
+		$katalog = esc_attr($instance['katalog']);
 
 		// Display the admin form
 		include( plugin_dir_path(__FILE__) . 'admin.php' );
@@ -922,8 +1143,11 @@ foreach ($bibliotek as $ettbibliotek) {
 	}
 echo "<option value=\"" . $temp[1] . "\"" . $hepp . ">" . $temp[0] . "</option>\n";
 }
+echo "</select>";
+echo "<br><br><i>Denne innstillingen kan overstyres ved &aring; angi et annet bibliotek i shortcode/kortkode, f.eks. slik: <strong>[wl-ils mittbibliotek=2021900]</strong> for B&aelig;rum folkebibliotek. Du finner en oppdatert liste over bibliotek-koder ved &aring; <a target=\"_blank\" href=\"" . plugins_url( 'bibkoder.php', __FILE__ ) . "\">klikke her</a>.</i>";
+
 ?>
-				</select>
+
 <h2>Innstillinger for alle bibliotek</h2>
 <h3>Visning</h3>
 <p>

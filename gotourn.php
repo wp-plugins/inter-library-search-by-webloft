@@ -31,11 +31,11 @@ list($width, $height, $type, $attr) = getimagesize($bildeurl);
 <meta name="twitter:image" content="<?php echo urldecode($bildeurl);?>" />
 <meta name="twitter:url" content="<?php echo strip_tags(stripslashes($params[2]));?>" />
 
-<meta name="author" content="<?php echo strip_tags(stripslashes($params[4]));?>" />
+<meta name="author" content="<?php echo utf8_decode(strip_tags(stripslashes($params[4])));?>" />
 <meta property="og:type" content="book" />
 <meta property="book:author" content="<?php echo urlencode(utf8_decode(strip_tags(stripslashes($params[4]))));?>">
 <meta property="book:isbn" content="<?php echo strip_tags(stripslashes($params[5]));?>">
-<meta property="og:description" content="<?php echo strip_tags(stripslashes($params[1]));?>">
+<meta property="og:description" content="<?php echo utf8_decode(strip_tags(stripslashes($params[1])));?>">
 <meta property="og:title" content="<?php echo strip_tags(stripslashes($params[0]));?>">
 <meta property="og:image" content="<?php echo urldecode($bildeurl);?>">
 <meta property="og:image:type" content="image/jpeg">
