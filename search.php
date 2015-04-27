@@ -1,6 +1,6 @@
 <?php
 
-$reglitre_debug = 0; // Sett til 1 for debug
+$reglitre_debug = 1; // Sett til 1 for debug
 
 /*
 // turn on for debug
