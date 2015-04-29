@@ -885,7 +885,7 @@ class wl_ils_widget extends WP_Widget {
 
 		parent::__construct(
 			$this->get_widget_slug(),
-			__( 'Inter Library Search by Webloft', $this->get_widget_slug() ),
+			__( 'ILS Search by Webloft', $this->get_widget_slug() ),
 			array(
 				'classname'  => $this->get_widget_slug().'-class',
 				'description' => __( 'Setter inn søkefelt for å søke og presentere fine trefflister integrert i Wordpress.', $this->get_widget_slug() )
