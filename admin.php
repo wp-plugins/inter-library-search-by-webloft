@@ -22,6 +22,23 @@ if ($post_query = get_posts($args)) {
 		echo "<input class=\"widefat\" id=\"" . $this->get_field_id( 'title' ) . "\" name=\"" . $this->get_field_name( 'title' ) . "\" type=\"text\" value=\"" . $title . "\" />\n";
 		echo "</label>\n";
 		echo "</p>\n\n";
+
+		echo "<p>\n";
+		echo "<label for=\"" . $this->get_field_id('resultatside') . "\">Hvilken bibliotekkatalog vil du søke i?</label>\n";
+		echo "<select name=\"" . $this->get_field_name('katalog') . "\" id=\"" . $this->get_field_id('katalog') . "\" class=\"widefat\">\n";
+		include ("serverliste.php");
+		foreach ($bibliotek as $ettbibliotek) {
+			$hepp = '';
+			$temp = explode ("|x|" , $ettbibliotek);
+			if ($temp[1] == $katalog) {
+				$hepp = " selected";
+			}
+			echo "<option value=\"" . $temp[1] . "\"" . $hepp . ">" . $temp[0] . "</option>\n";
+		}
+
+		echo "</select>\n";
+		echo "</p>\n";
+
 		echo "<p>\n";
 		echo "<label for=\"" . $this->get_field_id('resultatside') . "\">Hvilken side vil du sende trefflisten til?</label>\n";
 		echo "<select name=\"" . $this->get_field_name('resultatside') . "\" id=\"" . $this->get_field_id('resultatside') . "\" class=\"widefat\">\n";
