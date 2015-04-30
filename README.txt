@@ -3,7 +3,7 @@ Contributors: sundaune
 Tags: bibliotek, katalog, inter library search, search, søk, søking, søkemotor, bibliotekkatalog, bibliofil, bibsys, koha, metasøk, library, bibvenn, webekspertene, webløft, webloft, e-bok, ebok, e-book, e-books
 Requires at least: 4.0
 Tested up to: 4.2
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -135,6 +135,10 @@ NORWEGIAN:
 
 == Change log ==
 
+= 2.0.3 =
+
+* Bugfix: Widget redirecting search to result page didn't work
+
 = 2.0.2 =
 
 * Widget: Support for choosing the library catalogue to search in on a per-widget basis
@@ -172,6 +176,10 @@ NORWEGIAN:
 * First version
 
 NORWEGIAN:
+
+= 2.0.3 =
+
+* Bugfix: Widget omdirigerte ikke til riktig side for å vise trefflisten
 
 = 2.0.2 = 
 
@@ -211,8 +219,8 @@ NORWEGIAN:
 
 == Upgrade Notice ==
 
-Now: With Tidemann support!
+First official release!
 
 NORWEGIAN:
 
-Nå også med Tidemann-støtte!
+Første offisielle slipp!
