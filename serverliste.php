@@ -67,6 +67,7 @@ $bibliotek[] = "Moskenes folkebibliotek|x|2187400|x|http://www.moskenes.folkebib
 $bibliotek[] = "Moss bibliotek|x|2010400|x|http://www.moss.folkebibl.no/cgi-bin/sru|x|bibliofil|x|000000";
 $bibliotek[] = "Nannestad folkebibliotek|x|2023800|x|http://www.nannestad.folkebibl.no/cgi-bin/sru|x|bibliofil|x|000000";
 $bibliotek[] = "Narvik bibliotek|x|2180500|x|http://www.narvik.folkebibl.no/cgi-bin/sru|x|bibliofil|x|000000";
+$bibliotek[] = "Nedre Eiker bibliotek|x|2062500|x|http://www.nedre-eiker.folkebibl.no/cgi-bin/sru|x|bibliofil|x|000000";
 $bibliotek[] = "Nes folkebibliotek|x|2023600|x|http://www.nes-ak.folkebibl.no/cgi-bin/sru|x|bibliofil|x|000000";
 $bibliotek[] = "Nesna folkebibliotek|x|2182800|x|http://www.nesna.folkebibl.no/cgi-bin/sru|x|bibliofil|x|000000";
 $bibliotek[] = "Nittedal folkebibliotek|x|2023300|x|http://www.nittedal.folkebibl.no/cgi-bin/sru|x|bibliofil|x|000000";
