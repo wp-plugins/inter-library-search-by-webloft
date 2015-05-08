@@ -72,6 +72,7 @@ function get_content($url) { // Les inn en fil
      
 	curl_setopt ($ch, CURLOPT_URL, $url);  
 	curl_setopt ($ch, CURLOPT_HEADER, 0);  
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0); // For å hindre SSL-feil.
       
 	ob_start();  
       
