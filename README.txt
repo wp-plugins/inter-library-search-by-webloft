@@ -135,11 +135,6 @@ NORWEGIAN:
 
 == Change log ==
 
-= 2.0.4 = 
-
-* Bugfix: Fixed Moss bibliotek
-* New library: Nedre Eiker bibliotek
-
 = 2.0.3 =
 
 * Bugfix: Widget redirecting search to result page didn't work
@@ -181,11 +176,6 @@ NORWEGIAN:
 * First version
 
 NORWEGIAN:
-
-= 2.0.4 = 
-
-* Bugfix: Fikset Moss bibliotek
-* Nytt bibliotek: Nedre Eiker
 
 = 2.0.3 =
 
