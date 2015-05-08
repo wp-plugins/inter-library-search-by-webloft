@@ -3,7 +3,7 @@
 Plugin Name: ILS Search by Webloft
 Plugin URI: http://www.webekspertene.no/
 Description: Interlibrary search for your Wordpress site! NORWEGIAN: Setter inn s&oslash;kefelt som lar deg s&oslash;ke i mange forskjellige bibliotekssystemer.
-Version: 2.0.3
+Version: 2.0.4
 Author: H&aring;kon Sundaune / Webekspertene
 Author URI: http://www.webekspertene.no/
 */
