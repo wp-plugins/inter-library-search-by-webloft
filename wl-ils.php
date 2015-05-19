@@ -11,7 +11,8 @@ Author URI: http://www.webekspertene.no/
 
 // FIRST COMES THE SHORTCODE... EH, CODE!
 
-define('ILS_URL', plugins_url(basename(__DIR__)));
+//define('ILS_URL', plugins_url(basename(__DIR__)));
+define('ILS_URL', plugins_url('' , __FILE__));
 
 function wl_ils_func($atts){
 
