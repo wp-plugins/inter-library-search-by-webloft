@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 $resultatside = $instance['resultatside']; // ID til side som skal være TARGET for FORM
 $title = apply_filters( 'widget_title', $instance['title'] );
@@ -21,7 +21,7 @@ $resultatperma = get_permalink($resultatside);
 $sjokk = explode ("?" , $resultatperma); // alle query strings i $sjokk[1] HVIS DET ER NOEN
 
 echo "<form target=\"_self\" action=\"" . $sjokk[0] . "\" method=\"GET\">\n";
-echo "<input type=\"text\" id=\"search\" name=\"webloftsok_query\" placeholder=\"Søkeord...\" accept-charset=\"utf-8\" />";	 
+echo "<input type=\"text\" id=\"search\" name=\"webloftsok_query\" placeholder=\"Søkeord...\" accept-charset=\"utf-8\" />";
 echo "<input type=\"hidden\" name=\"katalog\" value=\"" . $katalog . "\" />";
 
 if (isset($sjokk[1])) {
@@ -30,8 +30,8 @@ if (isset($sjokk[1])) {
 		foreach ($parameters as $parameter) {
 			$ettparameter = explode ("=" , $parameter);
 			echo "<input type=\"hidden\" name=\"" . $ettparameter[0] . "\" value=\"" . $ettparameter[1] . "\" />";
-		}	
-	}	
+		}
+	}
 }
 
 if (trim($enkeltpost) != "") {
