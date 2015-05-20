@@ -83,4 +83,6 @@
     .tabs > ul > li { display: block; width: 100%; margin-bottom: 2px; }
     .tabs > ul > li a { border-radius: 4px; width: 100%; }
     .dot { width: 15px; height: 15px; border-radius: 15px; }
+	.ils-single-result h2 { font-size: 20px; }
+	
 }
