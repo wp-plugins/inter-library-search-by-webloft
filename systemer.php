@@ -1,37 +1,37 @@
 <?php
 
 //****************************************************************************************************
-function koha_antalltreff($url) { // finner antall treff for et søk 
+function koha_antalltreff($url) { // finner antall treff for et søk
 //****************************************************************************************************
-	
+
 	$koha_datafil = get_content($url);
 	$koha_data    = simplexml_load_string($koha_datafil);
-	
+
 	$antallfunnet = $koha_data->channel->children('opensearch', true)->totalResults;
-	
+
 	return $antallfunnet;
-	
+
 } // end function
 
 //****************************************************************************************************
 function koha_sok($url, $posisjon) {
 //****************************************************************************************************
-	
+
 	// Vi må slenge på posisjon i URL-en
 	$url = $url . "&offset=" . $posisjon;
-	
+
 	$koha_datafil = get_content($url);
 	$koha_data    = simplexml_load_string($koha_datafil);
 	$totalhtml    = '';
 	$pendel       = 0;
 	$hitcounter   = 0;
 	$treff        = '';
-	
+
 	foreach ($koha_data->channel->item as $item) {
 		$treff[$hitcounter]['permalink']  = (string)$item->link;
 		$treff[$hitcounter]['tittel']     = (string)$item->title;
 		$treff[$hitcounter]['tittelinfo'] = (string)$treff[$hitcounter]['tittel'];
-		
+
 		if (isset($item->description->p[0])) { // Koha-knøl
 			$beskrivelsetemp = strip_tags($item->description->p[0]);
 			$beskrivelsetemp = preg_replace('/[ \t]+/', ' ', preg_replace('/[\r\n]+/', "\n", $beskrivelsetemp));
@@ -46,80 +46,80 @@ function koha_sok($url, $posisjon) {
 		}
 		$beskrivelsetemp                   = str_replace("By ", "", $beskrivelsetemp); // Hvorfor står det "By " i beskrivelsen?
 		$treff[$hitcounter]['beskrivelse'] = $beskrivelsetemp;
-		
+
 		$treff[$hitcounter]['orgisbn'] = (string)$item->children('dc', true)->identifier;
-		$treff[$hitcounter]['orgisbn'] = str_replace("ISBN ", "", $treff[$hitcounter]['orgisbn']); // fjerne ISBN 
+		$treff[$hitcounter]['orgisbn'] = str_replace("ISBN ", "", $treff[$hitcounter]['orgisbn']); // fjerne ISBN
 		$treff[$hitcounter]['isbn'] = str_replace("-", "", $treff[$hitcounter]['orgisbn']); // fjerne bindestrek
 		$treff[$hitcounter]['isbn'] = str_replace(" ", "", $treff[$hitcounter]['isbn']); // fjerne mellomrom
-		
+
 		// Fjerne ISBN fra beskrivelsesteksten
 		$treff[$hitcounter]['beskrivelse'] = str_replace ($treff[$hitcounter]['orgisbn'] , "" , $treff[$hitcounter]['beskrivelse']);
 
 		$hitcounter++;
-		
+
 	} // slutt på hvert item
-	
-	
+
+
 	return ($treff);
-	
+
 } // end function
 
 
 //****************************************************************************************************
 function bibliofil_antalltreff($url) { // finner antall treff for et søk
 //****************************************************************************************************
-	
+
 	$sru_datafil = get_content($url);
 	$sru_data    = simplexml_load_string($sru_datafil);
-	
+
 	$namespaces = $sru_data->getNameSpaces(true);
 	$srw        = $sru_data->children($namespaces['SRU']); // alle som er srw:ditten og srw:datten
-	
+
 	$antallfunnet = $srw->numberOfRecords;
-	
+
 	return $antallfunnet;
-	
+
 } // end function
 
 //****************************************************************************************************
 function bibliofil_sok($url, $posisjon) {
 //****************************************************************************************************
-	
+
 	// Vi må slenge på posisjon i URL-en
 	$url = $url . "&startRecord=" . $posisjon;
 	$sru_datafil = get_content($url);
 	$sru_data    = simplexml_load_string($sru_datafil);
-	
+
 	$namespaces = $sru_data->getNameSpaces(true);
 	$srw        = $sru_data->children($namespaces['SRU']); // alle som er srw:ditten og srw:datten
-	
+
 	// Så ta selve filen og plukke ut det vi skal ha
-	
+
 	$hepphepp = str_replace("marcxchange:", "", $sru_datafil);
 	$hepphepp = strip_tags($hepphepp, "<record><leader><controlfield><datafield><subfield>");
 	$hepphepp = stristr($hepphepp, "<record");
-	
+
 	$newfile = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
 	$newfile .= "<collection>\n";
 	$newfile .= $hepphepp;
 	$newfile .= "</collection>";
-	
+
 	// Retrieve a set of MARC records from a file
-	
+
 	require 'File/MARCXML.php';
-	
+
 	$journals = new File_MARCXML($newfile, File_MARC::SOURCE_STRING);
 	// Iterate through the retrieved records
-	
+
 	$totalhtml  = '';
 	$pendel     = 0;
 	$hitcounter = 0;
 	$treff      = '';
-	
+
 	while ($record = $journals->next()) {
-		
+
 		// initialize variables
-		
+
 
 		if ($record->getField("001")) {
 			$identifier = $record->getField("001");
@@ -137,7 +137,7 @@ function bibliofil_sok($url, $posisjon) {
 		} else { // no permalink
 			$treff[$hitcounter]['permalink'] = "";
 		}
-	
+
 		if ($record->getField("245")) {
 			$tittel                          = $record->getField("245")->getSubfield("a");
 			$treff[$hitcounter]['tittel']    = substr($tittel, 5); // fjerne feltkoden i starten
@@ -148,7 +148,7 @@ function bibliofil_sok($url, $posisjon) {
 				$treff[$hitcounter]['ansvarsangivelse'] = substr($ansvar, 5); // fjerne feltkoden i starten
 			}
 		}
-		
+
 		if ($record->getField("574")) { // Originaltittel
 			$originaltittel = $record->getField("574")->getSubfield("a");
 			$originaltittel = substr($originaltittel, 5); // fjerne feltkoden i starten
@@ -172,7 +172,7 @@ function bibliofil_sok($url, $posisjon) {
 			$korporasjon                       = $record->getField("110")->getSubfield("a");
 			$treff[$hitcounter]['korporasjon'] = substr($korporasjon, 5); // fjerne feltkoden i starten
 		}
-		
+
 		if ($record->getField("20")) {
 			$isbn                       = $record->getField("20")->getSubfield("a");
 			$treff[$hitcounter]['isbn'] = substr($isbn, 5); // fjerne feltkoden i starten
@@ -181,12 +181,12 @@ function bibliofil_sok($url, $posisjon) {
 				$treff[$hitcounter]['heftetbundet'] = substr($heftetbundet, 5); // fjerne feltkoden i starten
 			}
 		}
-		
+
 		if ($record->getField("520")) {
 			$beskrivelse                       = $record->getField("520")->getSubfield("a");
 			$treff[$hitcounter]['beskrivelse'] = substr($beskrivelse, 5); // fjerne feltkoden i starten
 		}
-		
+
 		if ($record->getField("260")) {
 			$utgitthvor                       = $record->getField("260")->getSubfield("a");
 			$treff[$hitcounter]['utgitthvor'] = substr($utgitthvor, 5);
@@ -198,9 +198,9 @@ function bibliofil_sok($url, $posisjon) {
 			$treff[$hitcounter]['utgittaar']  = str_replace("]", "", $utgittaar);
 			$utgittaar                        = str_replace("<", "", $utgittaar); // disse to linjene fjerner < og > i årstall
 			$treff[$hitcounter]['utgittaar']  = str_replace(">", "", $utgittaar);
-			
+
 		}
-		
+
 		if ($record->getField("300")) { // omfang
 			$omfang = $record->getField("300")->getSubfield("a");
 			$omfang = substr($omfang, 5);
@@ -216,17 +216,17 @@ function bibliofil_sok($url, $posisjon) {
 		if ($record->getField("019")) {
 			$materialkode                       = $record->getField("019")->getSubfield("b");
 			$treff[$hitcounter]['materialkode'] = substr($materialkode, 5);
-			
+
 			// Hvis flere adskilt med komma går vi for den første
-			
+
 			if (stristr($treff[$hitcounter]['materialkode'], ",")) {
 				$temp                               = explode(",", $treff[$hitcounter]['materialkode']);
 				$treff[$hitcounter]['materialkode'] = $temp[0];
 			}
 		}
-		
+
 		// Ansvarsangivelse
-		
+
 		if (isset($treff[$hitcounter]['ansvarsangivelse'])) {
 			$treff[$hitcounter]['opphav'] = $treff[$hitcounter]['ansvarsangivelse'];
 		}
@@ -237,13 +237,13 @@ function bibliofil_sok($url, $posisjon) {
 				$treff[$hitcounter]['opphav'] .= " (" . $treff[$hitcounter]['forfatterliv'] . ")";
 			}
 		}
-		
+
 		if (isset($treff[$hitcounter]['korporasjon'])) {
 			$treff[$hitcounter]['opphav'] = $treff[$hitcounter]['korporasjon'];
 		}
-		
+
 		// Tittel
-		
+
 		$treff[$hitcounter]['tittelinfo'] = $treff[$hitcounter]['tittel'];
 		if ($treff[$hitcounter]['subtittel'] != '') {
 			$treff[$hitcounter]['tittelinfo'] .= " : " . $treff[$hitcounter]['subtittel'];
@@ -258,7 +258,7 @@ function bibliofil_sok($url, $posisjon) {
 
 	// Ikon
 		if (isset($treff[$hitcounter]['materialkode'])) { // materialkode er angitt
-			
+
 			switch ($treff[$hitcounter]['materialkode']) {
 				case "ee":
 					$treff[$hitcounter]['type'] = "dvd";
@@ -297,15 +297,15 @@ function bibliofil_sok($url, $posisjon) {
 					$treff[$hitcounter]['type'] = "ukjent";
 					break;
 			}
-			
+
 		} else { // materialkode ikke angitt, ergo ukjent
 			$treff[$hitcounter]['type'] = "ukjent";
 		}
-		
+
 		// REPETERBARE FELTER SJEKKES HER
-		
+
 		foreach ($record->getFields() as $tag => $subfields) {
-			
+
 			// Bestand: Sjekke 850
 
 			if ($tag == '850') {
@@ -319,7 +319,7 @@ function bibliofil_sok($url, $posisjon) {
 
 
 			// Lese utdrag: Sjekke 856
-	
+
 			if ($tag == '856') {
 				foreach ($subfields->getSubfields() as $code => $value) {
 					$ettfelt[(string) $code] = substr((string) $value, 5);
@@ -381,7 +381,7 @@ function bibliofil_sok($url, $posisjon) {
 			}
 
 			// Medarbeidernote: Sjekke 511 $a
-			
+
 			if ($tag == '511') {
 				foreach ($subfields->getSubfields() as $code => $value) {
 					$ettfelt[(string) $code] = substr((string) $value, 5);
@@ -393,7 +393,7 @@ function bibliofil_sok($url, $posisjon) {
 			}
 
 			// Titler: Sjekke 740 $a
-			
+
 			if ($tag == '740') {
 				foreach ($subfields->getSubfields() as $code => $value) {
 					$ettfelt[(string) $code] = substr((string) $value, 5);
@@ -405,7 +405,7 @@ function bibliofil_sok($url, $posisjon) {
 			}
 
 		}
-		
+
 		if (isset($ettemneord) && (is_array($ettemneord))) {
 			$ettemneord = array_unique ($ettemneord);
 			sort ($ettemneord);
@@ -417,40 +417,40 @@ function bibliofil_sok($url, $posisjon) {
 		@$treff[$hitcounter]['innholdsnote'] = $eninnholdsnote;
 		@$treff[$hitcounter]['medarbeidere'] = $enmedarbeidere;
 		@$treff[$hitcounter]['titler'] = $entittel;
-	
+
 		unset($etteks, $endewey, $ettemneord, $engenerellnote, $eninnholdsnote, $enmedarbeidere, $entittel);
-		
+
 		$hitcounter++;
 	} // slutt på hvert item
-	
+
 	/*
 	Omslag (hvordan?)
 	Tittel (årstall)   ev     Tittel : DVD (årstall)
 	Forfatter
 	Beskrivelse (ligger i 520 $a noen ganger)
-	Ikon basert på materialtype (liste her: 
-	
-	AKTUELLE KODER: 
+	Ikon basert på materialtype (liste her:
+
+	AKTUELLE KODER:
 	ee (DVD)
 	l (bok)
 	dc (CD)
 	de (digikort)
-	ga (nedlastbar fil)	
+	ga (nedlastbar fil)
 	dd (avspiller med lydfil)
 	di (lydbok)
 	dz (mp3, vi bruker lyd)
 	c (Musikktrykk)
 	ed (Videokassett VHS)
 	dg (Musikk)
-	
+
 	ALLE IKONER VI TRENGER: https://www.iconfinder.com/iconsets/windows-8-metro-style
-	
+
 	IKONER: Bok, lyd, note, film DVD, film VHS
-	
+
 	*/
 
 	return ($treff);
-	
+
 } // end function
 
 
@@ -458,57 +458,57 @@ function bibliofil_sok($url, $posisjon) {
 //****************************************************************************************************
 function tidemann_antalltreff($url) { // finner antall treff for et søk
 //****************************************************************************************************
-	
+
 	$sru_datafil = get_content($url);
 	$sru_data    = simplexml_load_string($sru_datafil);
-	
+
 	$namespaces = $sru_data->getNameSpaces(true);
 	$srw        = $sru_data->children($namespaces['srw']); // alle som er srw:ditten og srw:datten
-	
+
 	$antallfunnet = $srw->numberOfRecords;
-	
+
 	return $antallfunnet;
-	
+
 } // end function
 
 //****************************************************************************************************
 function tidemann_sok($url, $posisjon) {
 //****************************************************************************************************
-	
+
 	// Vi må slenge på posisjon i URL-en
 	$url = $url . "&startRecord=" . $posisjon;
 	$sru_datafil = get_content($url);
 	$sru_data    = simplexml_load_string($sru_datafil);
 	$namespaces = $sru_data->getNameSpaces(true);
 	$srw        = $sru_data->children($namespaces['srw']); // alle som er srw:ditten og srw:datten
-	
+
 	// Så ta selve filen og plukke ut det vi skal ha
-	
+
 	$hepphepp = str_replace("marc:", "", $sru_datafil);
 	$hepphepp = strip_tags($hepphepp, "<record><leader><controlfield><datafield><subfield>");
 	$hepphepp = stristr($hepphepp, "<record");
-	
+
 	$newfile = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
 	$newfile .= "<collection>\n";
 	$newfile .= $hepphepp;
 	$newfile .= "</collection>";
-	
+
 	// Retrieve a set of MARC records from a file
-	
+
 	require 'File/MARCXML.php';
-	
+
 	$journals = new File_MARCXML($newfile, File_MARC::SOURCE_STRING);
 	// Iterate through the retrieved records
-	
+
 	$totalhtml  = '';
 	$pendel     = 0;
 	$hitcounter = 0;
 	$treff      = '';
-	
+
 	while ($record = $journals->next()) {
-		
+
 		// initialize variables
-		
+
 
 		if ($record->getField("001")) {
 			$identifier = $record->getField("001");
@@ -537,7 +537,7 @@ function tidemann_sok($url, $posisjon) {
 				$treff[$hitcounter]['ansvarsangivelse'] = substr($ansvar, 5); // fjerne feltkoden i starten
 			}
 		}
-		
+
 		if ($record->getField("574")) { // Originaltittel
 			$originaltittel = $record->getField("574")->getSubfield("a");
 			$originaltittel = substr($originaltittel, 5); // fjerne feltkoden i starten
@@ -561,7 +561,7 @@ function tidemann_sok($url, $posisjon) {
 			$korporasjon                       = $record->getField("110")->getSubfield("a");
 			$treff[$hitcounter]['korporasjon'] = substr($korporasjon, 5); // fjerne feltkoden i starten
 		}
-		
+
 		if ($record->getField("20")) {
 			$isbn                       = $record->getField("20")->getSubfield("a");
 			$treff[$hitcounter]['isbn'] = substr($isbn, 5); // fjerne feltkoden i starten
@@ -570,12 +570,12 @@ function tidemann_sok($url, $posisjon) {
 				$treff[$hitcounter]['heftetbundet'] = substr($heftetbundet, 5); // fjerne feltkoden i starten
 			}
 		}
-		
+
 		if ($record->getField("520")) {
 			$beskrivelse                       = $record->getField("520")->getSubfield("a");
 			$treff[$hitcounter]['beskrivelse'] = substr($beskrivelse, 5); // fjerne feltkoden i starten
 		}
-		
+
 		if ($record->getField("260")) {
 			$utgitthvor                       = $record->getField("260")->getSubfield("a");
 			$treff[$hitcounter]['utgitthvor'] = substr($utgitthvor, 5);
@@ -587,9 +587,9 @@ function tidemann_sok($url, $posisjon) {
 			$treff[$hitcounter]['utgittaar']  = str_replace("]", "", $utgittaar);
 			$utgittaar                        = str_replace("<", "", $utgittaar); // disse to linjene fjerner < og > i årstall
 			$treff[$hitcounter]['utgittaar']  = str_replace(">", "", $utgittaar);
-			
+
 		}
-		
+
 		if ($record->getField("300")) { // omfang
 			$omfang = $record->getField("300")->getSubfield("a");
 			$omfang = substr($omfang, 5);
@@ -605,17 +605,17 @@ function tidemann_sok($url, $posisjon) {
 		if ($record->getField("019")) {
 			$materialkode                       = $record->getField("019")->getSubfield("b");
 			$treff[$hitcounter]['materialkode'] = substr($materialkode, 5);
-			
+
 			// Hvis flere adskilt med komma går vi for den første
-			
+
 			if (stristr($treff[$hitcounter]['materialkode'], ",")) {
 				$temp                               = explode(",", $treff[$hitcounter]['materialkode']);
 				$treff[$hitcounter]['materialkode'] = $temp[0];
 			}
 		}
-		
+
 		// Ansvarsangivelse
-		
+
 		if (isset($treff[$hitcounter]['ansvarsangivelse'])) {
 			$treff[$hitcounter]['opphav'] = $treff[$hitcounter]['ansvarsangivelse'];
 		}
@@ -626,13 +626,13 @@ function tidemann_sok($url, $posisjon) {
 				$treff[$hitcounter]['opphav'] .= " (" . $treff[$hitcounter]['forfatterliv'] . ")";
 			}
 		}
-		
+
 		if (isset($treff[$hitcounter]['korporasjon'])) {
 			$treff[$hitcounter]['opphav'] = $treff[$hitcounter]['korporasjon'];
 		}
-		
+
 		// Tittel
-		
+
 		$treff[$hitcounter]['tittelinfo'] = $treff[$hitcounter]['tittel'];
 		if ($treff[$hitcounter]['subtittel'] != '') {
 			$treff[$hitcounter]['tittelinfo'] .= " : " . $treff[$hitcounter]['subtittel'];
@@ -647,7 +647,7 @@ function tidemann_sok($url, $posisjon) {
 
 	// Ikon
 		if (isset($treff[$hitcounter]['materialkode'])) { // materialkode er angitt
-			
+
 			switch ($treff[$hitcounter]['materialkode']) {
 				case "ee":
 					$treff[$hitcounter]['type'] = "dvd";
@@ -686,15 +686,15 @@ function tidemann_sok($url, $posisjon) {
 					$treff[$hitcounter]['type'] = "ukjent";
 					break;
 			}
-			
+
 		} else { // materialkode ikke angitt, ergo ukjent
 			$treff[$hitcounter]['type'] = "ukjent";
 		}
-		
+
 		// REPETERBARE FELTER SJEKKES HER
-		
+
 		foreach ($record->getFields() as $tag => $subfields) {
-			
+
 			// Bestand: Sjekke 850
 
 			if ($tag == '850') {
@@ -705,7 +705,7 @@ function tidemann_sok($url, $posisjon) {
 				$etteks[] = $ettfelt;
 				unset($ettfelt);
 			}
-	
+
 			// Dewey: Sjekke 082 $a
 
 			if ($tag == '082') {
@@ -755,7 +755,7 @@ function tidemann_sok($url, $posisjon) {
 			}
 
 			// Medarbeidernote: Sjekke 511 $a
-			
+
 			if ($tag == '511') {
 				foreach ($subfields->getSubfields() as $code => $value) {
 					$ettfelt[(string) $code] = substr((string) $value, 5);
@@ -767,7 +767,7 @@ function tidemann_sok($url, $posisjon) {
 			}
 
 			// Titler: Sjekke 740 $a
-			
+
 			if ($tag == '740') {
 				foreach ($subfields->getSubfields() as $code => $value) {
 					$ettfelt[(string) $code] = substr((string) $value, 5);
@@ -779,7 +779,7 @@ function tidemann_sok($url, $posisjon) {
 			}
 
 		}
-		
+
 		if (isset($ettemneord) && (is_array($ettemneord))) {
 			$ettemneord = array_unique ($ettemneord);
 			sort ($ettemneord);
@@ -791,44 +791,44 @@ function tidemann_sok($url, $posisjon) {
 		@$treff[$hitcounter]['innholdsnote'] = $eninnholdsnote;
 		@$treff[$hitcounter]['medarbeidere'] = $enmedarbeidere;
 		@$treff[$hitcounter]['titler'] = $entittel;
-	
+
 		unset($etteks, $endewey, $ettemneord, $engenerellnote, $eninnholdsnote, $enmedarbeidere, $entittel);
-		
+
 		$hitcounter++;
 	} // slutt på hvert item
-	
+
 	/*
 	Omslag (hvordan?)
 	Tittel (årstall)   ev     Tittel : DVD (årstall)
 	Forfatter
 	Beskrivelse (ligger i 520 $a noen ganger)
-	Ikon basert på materialtype (liste her: 
-	
-	AKTUELLE KODER: 
+	Ikon basert på materialtype (liste her:
+
+	AKTUELLE KODER:
 	ee (DVD)
 	l (bok)
 	dc (CD)
 	de (digikort)
-	ga (nedlastbar fil)	
+	ga (nedlastbar fil)
 	dd (avspiller med lydfil)
 	di (lydbok)
 	dz (mp3, vi bruker lyd)
 	c (Musikktrykk)
 	ed (Videokassett VHS)
 	dg (Musikk)
-	
+
 	ALLE IKONER VI TRENGER: https://www.iconfinder.com/iconsets/windows-8-metro-style
-	
+
 	IKONER: Bok, lyd, note, film DVD, film VHS
-	
+
 	*/
 
 	return ($treff);
-	
+
 } // end function
 
 
-//****************************************************************************************************	
+//****************************************************************************************************
 function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, avdkode til bibl, sjekke bestand? (1/0), starte på treff nummer
 //****************************************************************************************************
 
@@ -838,32 +838,32 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 	$sru_data    = simplexml_load_string($sru_datafil);
 	$namespaces  = $sru_data->getNameSpaces(true);
 	$srw         = $sru_data->children($namespaces['srw']); // alle som er srw:ditten og srw:datten
-	
+
 	// Så ta selve filen og plukke ut det vi skal ha
-	
+
 	$hepphepp = str_replace("marc:", "", $sru_datafil);
 	$hepphepp = strip_tags($hepphepp, "<record><controlfield><leader><datafield><subfield>");
 	$hepphepp = stristr($hepphepp, "<record");
-	
+
 	$newfile = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
 	$newfile .= "<collection>\n";
 	$newfile .= $hepphepp;
 	$newfile .= "</collection>";
-	
+
 	// Retrieve a set of MARC records from a file
 	require 'File/MARCXML.php';
-	
+
 	$journals = new File_MARCXML($newfile, File_MARC::SOURCE_STRING);
-	
+
 	// Iterate through the retrieved records
-	
+
 	$totalhtml  = '';
 	$pendel     = 0;
 	$hitcounter = 0;
 	$treff      = '';
-	
+
 	while ($record = $journals->next()) {
-	
+
 		// Elektronisk utgave finnes i 776
 		if ($record->getField("776")) {
 			if ($record->getField("776")->getSubfield("w")) {
@@ -877,14 +877,14 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 			$permalink                       = $record->getField("996")->getSubfield("u");
 			$treff[$hitcounter]['permalink'] = stristr($permalink, "http");
 		}
-		
+
 		if ($record->getField("001")) { // så leter vi i 001
 			$treff[$hitcounter]['identifier'] = $record->getField("001");
 			$treff[$hitcounter]['identifier'] = trim(substr($treff[$hitcounter]['identifier'], 5));
 			$treff[$hitcounter]['permalink']  = "http://ask.bibsys.no/ask/action/show?pid=" . $treff[$hitcounter]['identifier'] . "&kid=biblio";
 			$bibsystocheck[]                  = "id=" . $treff[$hitcounter]['identifier']; // legger til i listen over Bisys-bestand å sjekke
 		}
-		
+
 		$tempbeskrivelse = $record->getFields("856"); // lenke til fulltekst eller omslagsbilde finnes ev. her
 		if ($tempbeskrivelse) {
 			foreach ($tempbeskrivelse as $tempfield) {
@@ -903,7 +903,7 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 				}
 			}
 		}
-		
+
 		if ($record->getField("245")) {
 			$tittel                          = $record->getField("245")->getSubfield("a");
 			$treff[$hitcounter]['tittel']    = substr($tittel, 5); // fjerne feltkoden i starten
@@ -928,7 +928,7 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 				$treff[$hitcounter]['originaltittel'] = trim($originaltittel);
 			}
 		}
-		
+
 		if ($record->getField("300")) { // omfang
 			$omfang = $record->getField("300")->getSubfield("a");
 			$omfang = substr($omfang, 5);
@@ -939,7 +939,7 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 			}
 		$treff[$hitcounter]['omfang'] = $omfang;
 		}
-		
+
 		if ($record->getField("100")) {
 			$forfatter                       = $record->getField("100")->getSubfield("a");
 			$treff[$hitcounter]['forfatter'] = substr($forfatter, 5); // fjerne feltkoden i starten
@@ -948,13 +948,13 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 				$treff[$hitcounter]['forfatterliv'] = substr($forfatterliv, 5); // fjerne feltkoden i starten
 			}
 		}
-	
-	
+
+
 		if ($record->getField("110")) {
 			$korporasjon                       = $record->getField("110")->getSubfield("a");
 			$treff[$hitcounter]['korporasjon'] = substr($korporasjon, 5); // fjerne feltkoden i starten
 		}
-		
+
 		if ($record->getField("20")) {
 			$isbn                       = $record->getField("20")->getSubfield("a");
 			$treff[$hitcounter]['isbn'] = substr($isbn, 5); // fjerne feltkoden i starten
@@ -963,12 +963,12 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 				$treff[$hitcounter]['heftetbundet'] = substr($heftetbundet, 5); // fjerne feltkoden i starten
 			}
 		}
-		
+
 		if ($record->getField("520")) {
 			$beskrivelse                       = $record->getField("520")->getSubfield("a");
 			$treff[$hitcounter]['beskrivelse'] = substr($beskrivelse, 5); // fjerne feltkoden i starten
 		}
-		
+
 		if ($record->getField("260")) {
 			$utgitthvor                       = $record->getField("260")->getSubfield("a");
 			$treff[$hitcounter]['utgitthvor'] = substr($utgitthvor, 5);
@@ -979,13 +979,13 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 			$utgittaar                        = str_replace("[", "", $utgittaar); // disse to linjene fjerner [ og ] i årstall
 			$treff[$hitcounter]['utgittaar']  = str_replace("]", "", $utgittaar);
 		}
-		
+
 		if ($record->getField("019")) {
 			$materialkode                       = $record->getField("019")->getSubfield("b");
 			$treff[$hitcounter]['materialkode'] = substr($materialkode, 5);
-			
+
 			// Hvis flere adskilt med komma går vi for den siste
-			
+
 			if (stristr($treff[$hitcounter]['materialkode'], ",")) {
 				$temp                               = explode(",", $treff[$hitcounter]['materialkode']);
 				$treff[$hitcounter]['materialkode'] = end($temp);
@@ -993,9 +993,9 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 		} else {
 			$treff[$hitcounter]['materialkode'] = ''; // initialize
 		}
-		
+
 		// Ansvarsangivelse
-		
+
 		if (isset($treff[$hitcounter]['forfatter'])) {
 			$treff[$hitcounter]['opphav'] = $treff[$hitcounter]['forfatter'];
 			if (isset($treff[$hitcounter]['forfatterliv'])) {
@@ -1003,11 +1003,11 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 			}
 		}
 
-		
+
 		if (isset($treff[$hitcounter]['korporasjon'])) {
 			$treff[$hitcounter]['opphav'] = $treff[$hitcounter]['korporasjon'];
 		}
-		
+
 
 		// Tittel
 		$treff[$hitcounter]['tittelinfo'] = $treff[$hitcounter]['tittel'];
@@ -1017,16 +1017,16 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 		if ($treff[$hitcounter]['materialkode'] == 'ee') { // DVD?
 			$treff[$hitcounter]['tittelinfo'] .= " : DVD";
 		}
-		
+
 			// Gjøre det pent
 			$treff[$hitcounter]['tittelinfo'] = str_replace(": :", ":", $treff[$hitcounter]['tittelinfo']);
-		
+
 		// Ikon - her bruker vi leader-feltet, posisjon 006/007
-		
+
 		$leader                             = $record->getLeader();
 		$treff[$hitcounter]['materialkode'] = substr($leader, 6, 1);
 		$treff[$hitcounter]['kategorikode'] = substr($leader, 7, 1);
-		
+
 		switch ($treff[$hitcounter]['materialkode']) {
 			case "a":
 				$treff[$hitcounter]['type'] = "bok";
@@ -1047,16 +1047,16 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 				$treff[$hitcounter]['type'] = "ukjent";
 				break;
 		}
-		
+
 		if ($treff[$hitcounter]['kategorikode'] == "s") { // Ops, periodika!!
 			$treff[$hitcounter]['type'] = "periodika";
 		}
 
-	
+
 		// REPETERBARE FELTER SJEKKES HER
-		
+
 		foreach ($record->getFields() as $tag => $subfields) {
-			
+
 			// Dewey: Sjekke 082 $a
 
 			if ($tag == '082') {
@@ -1094,7 +1094,7 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 			}
 
 			// Titler: Sjekke 740 $a
-			
+
 			if ($tag == '740') {
 				foreach ($subfields->getSubfields() as $code => $value) {
 					$ettfelt[(string) $code] = substr((string) $value, 5);
@@ -1106,7 +1106,7 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 			}
 
 			// Medarbeidere: Sjekke 511 $a
-			
+
 			if ($tag == '511') {
 				foreach ($subfields->getSubfields() as $code => $value) {
 					$ettfelt[(string) $code] = substr((string) $value, 5);
@@ -1116,26 +1116,26 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 					$enmedarbeidere[] = $medarbeidere;
 				}
 			}
-		}	
+		}
 		// SLUTT PÅ REPETERBARE FELTER, LA OSS OPPDATERE OG RYDDE
 		@$treff[$hitcounter]['dewey'] = $endewey;
 		@$treff[$hitcounter]['emneord'] = $ettemne;
 		@$treff[$hitcounter]['generellnote'] = $engenerellnote;
 		@$treff[$hitcounter]['titler'] = $entittel;
 		@$treff[$hitcounter]['medarbeidere'] = $enmedarbeidere;
-	
+
 		unset($endewey, $ettemne, $engenerellnote, $entittel, $enmedarbeidere);
-		
+
 		$hitcounter++;
 
 	} // slutt på hvert item
-	
-	// Sjekke bestand i Bibsys HVIS denne option er satt	
+
+	// Sjekke bestand i Bibsys HVIS denne option er satt
 	if (($hamedbibsys == 1) && (isset($bibsystocheck)) && (is_array($bibsystocheck))) {
 		unset ($targetdokumenter);
 		$bibsysstreng      = implode("&", $bibsystocheck);
 		$tilgjengelig      = "http://alfa-a.bibsys.no/services/json/availabilityService.jsp?" . $bibsysstreng;
-		$hvaertilgjengelig = json_decode(get_content($tilgjengelig));		
+		$hvaertilgjengelig = json_decode(get_content($tilgjengelig));
 //domp ($hvaertilgjengelig);
 		foreach ($hvaertilgjengelig->list->documents as $ettdokument) {
 //rop ($ettdokument->bibcode);
@@ -1143,13 +1143,13 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 				$targetdokumenter[] = $ettdokument; // Hvis vår avdkode vil vi ha den
 			}
 			if (($ettdokument->circulationStatus == "0") && ($ettdokument->useRestriction == "0")) {
-				$targetdokumenter[] = $ettdokument; // Dette betyr digitalt tilgjengelig... tror vi. 
+				$targetdokumenter[] = $ettdokument; // Dette betyr digitalt tilgjengelig... tror vi.
 			}
 
 		}
 		$targetdokumenter = array_map("unserialize", array_unique(array_map("serialize", $targetdokumenter))); // fjerne duplikater
 		// Bibsys gir treff også på tapte dokumenter, dokumenter som ikke finnes... så hvis bestandsinfo ikke returneres dropper vi treffet
-		
+
 		foreach ($treff as $mangetreff => &$etttreff) { // for hvert treff i trefflista
 			if (is_array($targetdokumenter)) {
 				foreach ($targetdokumenter as $ettdokument) { // for hvert bestandstreff
@@ -1158,14 +1158,14 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 					}
 				}
 			$nyetreff[] = $etttreff;
-			}				
+			}
 		}
 
 		// Må luke ut noen duplikater, siden treff f.eks. blir lagt til to ganger hvis to eksemplarer er tilgjengelige
-		$nyetreff = array_map("unserialize", array_unique(array_map("serialize", $nyetreff))); // fjerne duplikater		
+		$nyetreff = array_map("unserialize", array_unique(array_map("serialize", $nyetreff))); // fjerne duplikater
 		return ($nyetreff);
-		
-	} else { // skal ikke sjekke bestand, vi tar den trefflista vi har		
+
+	} else { // skal ikke sjekke bestand, vi tar den trefflista vi har
 		return ($treff);
 	}
 } // slutt på bibsys-søke-funksjon
@@ -1173,15 +1173,15 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 //****************************************************************************************************
 function bibsys_antalltreff($url) {
 //****************************************************************************************************
-	
+
 	$sru_datafil = get_content($url);
 	$sru_data    = simplexml_load_string($sru_datafil);
-	
+
 	$namespaces = $sru_data->getNameSpaces(true);
 	$srw        = $sru_data->children($namespaces['srw']); // alle som er srw:ditten og srw:datten
-	
+
 	$antallfunnet = $srw->numberOfRecords;
-	
+
 	return $antallfunnet;
 }
 
