@@ -3,7 +3,7 @@ Contributors: sundaune
 Tags: bibliotek, katalog, inter library search, search, søk, søking, søkemotor, bibliotekkatalog, bibliofil, bibsys, koha, metasøk, library, bibvenn, webekspertene, webløft, webloft, e-bok, ebok, e-book, e-books
 Requires at least: 4.0
 Tested up to: 4.2
-Stable tag: 2.1
+Stable tag: 2.1.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -135,6 +135,10 @@ NORWEGIAN:
 
 == Change log ==
 
+= 2.1.1 =
+
+* Should no longer require the PEAR_Exception class
+
 = 2.1 =
 
 * Code rewrite to simplify a bit
@@ -186,6 +190,10 @@ NORWEGIAN:
 * First version
 
 NORWEGIAN:
+
+= 2.1.1 =
+
+* Skal ikke lenger være avhengig av PEAR_Exception-klassen
 
 = 2.1 =
 

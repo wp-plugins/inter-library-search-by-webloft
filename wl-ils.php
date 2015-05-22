@@ -3,7 +3,7 @@
 Plugin Name: ILS Search by Webloft
 Plugin URI: http://www.webekspertene.no/
 Description: Interlibrary search for your Wordpress site! NORWEGIAN: Setter inn s&oslash;kefelt som lar deg s&oslash;ke i mange forskjellige bibliotekssystemer.
-Version: 2.1
+Version: 2.1.1
 Author: H&aring;kon Sundaune / Webekspertene
 Author URI: http://www.webekspertene.no/
 */
@@ -105,8 +105,7 @@ function enkeltpost_func ($atts)
 	$system = str_replace ("&" , "" , $system); // fjern &
 	$system = str_replace ("system=" , "" , $system); // fjern det andre
 	$system = strtolower($system);
-
-	if (isset($info)) {
+	if ((isset($info)) && ($info != '')) {
 
 		//************** VISER ENKELPOST ***************
 
