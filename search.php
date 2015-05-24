@@ -4,10 +4,11 @@ $reglitre_debug = 0; // Sett til 1 for debug
 
 
 // turn on for debug
+/*
 ini_set('display_startup_errors',1);
 ini_set('display_errors',1);
 error_reporting(-1);
-
+*/
 
 /*
 URL til testdata som funker
