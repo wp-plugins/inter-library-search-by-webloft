@@ -2,7 +2,6 @@
 
 $reglitre_debug = 0; // Sett til 1 for debug
 
-
 // turn on for debug
 /*
 ini_set('display_startup_errors',1);
@@ -33,6 +32,7 @@ require_once("systemer.php"); // forskjellige bib.systemers måte å søke på
 require_once("functions.php"); // funksjoner vi har bruk for
 
 $mittbibliotek   = stripslashes(strip_tags($_REQUEST['mittbibliotek']));
+
 if (isset($_REQUEST['enkeltposturl'])) {
 	$enkeltposturl   = base64_decode(urldecode($_REQUEST['enkeltposturl']));
 }
@@ -232,8 +232,8 @@ if ($antallfunnet > 0) { // kan være tom
 
 // OBS! Koha kan ikke bruke enkel, ny måte for vi har ikke unik post-ID som kan søkes opp
 
-if (stristr($_SERVER['HTTP_REFERER'] , "enkeltposturl")) { // Vi har det i referer, overstyrer den vi hadde
-	$dump = stristr ($_SERVER['HTTP_REFERER'] , "enkeltposturl="); // fra enkelposturl og ut;
+if (stristr($_SERVER['QUERY_STRING'] , "enkeltposturl")) { // Vi har det i referer, overstyrer den vi hadde
+	$dump = stristr ($_SERVER['QUERY_STRING'] , "enkeltposturl="); // fra enkelposturl og ut;
 	if (stristr("&" , $dump)) { // flere vars?
 		$dump = stristr ($dump , "&", TRUE) ; // fram til FØRSTE "&"
 	}
@@ -242,7 +242,6 @@ if (stristr($_SERVER['HTTP_REFERER'] , "enkeltposturl")) { // Vi har det i refer
 	}
 	$enkeltposturl = base64_decode(urldecode(str_replace ("enkeltposturl=" , "" , $dump)));
 }
-
 
 if ((isset($enkeltposturl)) && ($enkeltposturl != "")) { // det finnes en url til side hvor enkeltposter skal vises
 	if (is_array($treffliste) && count($treffliste)) {
@@ -261,7 +260,9 @@ if ((isset($enkeltposturl)) && ($enkeltposturl != "")) { // det finnes en url ti
 				$etttreff['permalink'] = $enkeltposturl . "&system=" . $mittsystem . "&enkeltpostinfo=" . $treffinfo;
 			} else { // Dette er den første
 				$etttreff['permalink'] = $enkeltposturl . "?system=" . $mittsystem . "&enkeltpostinfo=" . $treffinfo;
-			}
+			}	
+
+			$etttreff['url'] = $etttreff['permalink']; // vil gjerne bruke disse om hverandre
 		}
 	}
 }

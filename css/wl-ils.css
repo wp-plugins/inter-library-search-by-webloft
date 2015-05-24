@@ -46,6 +46,7 @@
 .ils-single-result .social { margin-top: 4px; }
 .ils-single-result .social a { display: inline-block; text-decoration: none; border: 0; transition: opacity 0.1s linear; }
 .ils-single-result .social a:hover { opacity: 0.7; }
+.ils-single-result .social a > img { box-shadow: none; }
 
 .ils-single-result .buttons { margin: 15px 0 30px 0; }
 .ils-single-result button {

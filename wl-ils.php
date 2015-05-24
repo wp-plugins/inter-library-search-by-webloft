@@ -3,7 +3,7 @@
 Plugin Name: ILS Search by Webloft
 Plugin URI: http://www.webekspertene.no/
 Description: Interlibrary search for your Wordpress site! NORWEGIAN: Setter inn s&oslash;kefelt som lar deg s&oslash;ke i mange forskjellige bibliotekssystemer.
-Version: 2.1.1
+Version: 2.2
 Author: H&aring;kon Sundaune / Webekspertene
 Author URI: http://www.webekspertene.no/
 */
@@ -54,9 +54,14 @@ if (isset($_REQUEST['katalog'])) { // kan være satt i widget
 	$brukbibliotek = stripslashes(strip_tags($_REQUEST['katalog']));
 }
 
+
+if (isset($_REQUEST['enkeltposturl'])) { // kan være satt i widget
+	$enkeltposturl = stripslashes(strip_tags($_REQUEST['enkeltposturl']));
+}
+
 // lage URL i tilfelle det er lenket direkte til søkeside
 
-$frameurl = plugins_url('search.php' , __FILE__) . "?mittbibliotek=" . $brukbibliotek . "&omslagbokkilden=" . $omslagbokkilden . "&bibsysbestand=" . $bibsysbestand . "&omslagnb=" . $omslagnb . "&hamedbilder=" . $hamedbilder . "&makstreff=" . $makstreff . "&s=" . $hamedsok;
+$frameurl = plugins_url('search.php' , __FILE__) . "?mittbibliotek=" . $brukbibliotek . "&omslagbokkilden=" . $omslagbokkilden . "&bibsysbestand=" . $bibsysbestand . "&omslagnb=" . $omslagnb . "&hamedbilder=" . $hamedbilder . "&makstreff=" . $makstreff . "&s=" . $hamedsok . "&enkeltposturl=" . $enkeltposturl;
 
 if ($hamedsok != '') {
 	$framekode = " src=\"" . $frameurl . "\"";
@@ -108,7 +113,6 @@ function enkeltpost_func ($atts)
 	if ((isset($info)) && ($info != '')) {
 
 		//************** VISER ENKELPOST ***************
-
 		if ($system == "koha") { // hvis Koha har vi fått all info i query string
 			$treff = unserialize(base64_decode($info));
 		} else { // Ikke koha, vi må gjøre oppslag

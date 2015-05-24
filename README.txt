@@ -3,7 +3,7 @@ Contributors: sundaune
 Tags: bibliotek, katalog, inter library search, search, søk, søking, søkemotor, bibliotekkatalog, bibliofil, bibsys, koha, metasøk, library, bibvenn, webekspertene, webløft, webloft, e-bok, ebok, e-book, e-books
 Requires at least: 4.0
 Tested up to: 4.2
-Stable tag: 2.1.1
+Stable tag: 2.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -135,6 +135,12 @@ NORWEGIAN:
 
 == Change log ==
 
+= 2.2 =
+
+* Bugfix: Widget now works with displaying single post on its own page
+* Cleanup: Functions code no longer conflicts with other addons
+* Visual: Fixed social media icons for sharing single posts
+
 = 2.1.1 =
 
 * Should no longer require the PEAR_Exception class
@@ -190,6 +196,12 @@ NORWEGIAN:
 * First version
 
 NORWEGIAN:
+
+= 2.2 =
+
+* Bugfix: Widget fungerer nå selv når man skal vise enkeltposter på en egen side
+* Opprydning: Koden med funksjoner vil ikke havne i konflikt med andre utvidelser
+* Visuelt: Fikset ikonene for å dele enkeltposter på sosiale media
 
 = 2.1.1 =
 
