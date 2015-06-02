@@ -3,7 +3,7 @@
 Plugin Name: ILS Search by Webloft
 Plugin URI: http://www.webekspertene.no/
 Description: Interlibrary search for your Wordpress site! NORWEGIAN: Setter inn s&oslash;kefelt som lar deg s&oslash;ke i mange forskjellige bibliotekssystemer.
-Version: 2.3
+Version: 2.3.1
 Author: H&aring;kon Sundaune / Webekspertene
 Author URI: http://www.webekspertene.no/
 */
@@ -62,7 +62,7 @@ if (isset($_REQUEST['enkeltposturl'])) { // kan være satt i widget
 
 // lage URL i tilfelle det er lenket direkte til søkeside
 
-$frameurl = plugins_url('search.php' , __FILE__) . "?mittbibliotek=" . $brukbibliotek . "&omslagbokkilden=" . $omslagbokkilden . "&bibsysbestand=" . $bibsysbestand . "&omslagnb=" . $omslagnb . "&hamedbilder=" . $hamedbilder . "&makstreff=" . $makstreff . "&s=" . $hamedsok . "&enkeltposturl=" . $enkeltposturl . "&treffbokhylla=" . $treffbokhylla . "&dobokhylla=0";
+$frameurl = plugins_url('search.php' , __FILE__) . "?mittbibliotek=" . $brukbibliotek . "&omslagbokkilden=" . $omslagbokkilden . "&bibsysbestand=" . $bibsysbestand . "&omslagnb=" . $omslagnb . "&hamedbilder=" . $hamedbilder . "&makstreff=" . $makstreff . "&wl_ils_s=" . $hamedsok . "&enkeltposturl=" . $enkeltposturl . "&treffbokhylla=" . $treffbokhylla . "&dobokhylla=0";
 
 if ($hamedsok != '') {
 	$framekode = " src=\"" . $frameurl . "\"";
