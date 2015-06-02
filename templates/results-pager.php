@@ -32,14 +32,14 @@ if (($nesteposisjon + $treffperside) > $antallfunnet) {
 
         <p>
             Viser treff <?= $posisjon ?>-<?= $nesteposisjon ?>
-            av <?= $antallfunnet ?> ved søk etter '<?= $qsokeord ?>'
+            av <?= $antallfunnet ?> ved søk<?= $ibokhylla ?>etter '<?= $qsokeord ?>'
         </p>
 
     <?php else: ?>
 
         <p>
             Viser treff 1-<?= $antallfunnet ?>
-            ved søk etter '<?= $qsokeord ?>'
+            ved søk<?= $ibokhylla ?>etter '<?= $qsokeord ?>'
         </p>
 
     <?php endif; ?>

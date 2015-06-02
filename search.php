@@ -40,7 +40,8 @@ $omslagbokkilden = stripslashes(strip_tags($_REQUEST['omslagbokkilden']));
 $omslagnb        = stripslashes(strip_tags($_REQUEST['omslagnb']));
 $hamedbilder     = stripslashes(strip_tags($_REQUEST['hamedbilder']));
 $bibsysbestand   = stripslashes(strip_tags($_REQUEST['bibsysbestand']));
-$sokeord         = trim(stripslashes(strip_tags($_REQUEST['s'])));
+$treffbokhylla   = (int) ($_REQUEST['treffbokhylla']);
+$sokeord         = trim(stripslashes(strip_tags($_REQUEST['wl_ils_s'])));
 if (isset($_REQUEST['posisjon'])) {
 	$posisjon = (int) ($_REQUEST['posisjon']);
 } else {
@@ -68,6 +69,13 @@ foreach ($bibliotek as $ettbibliotek) {
 		$minavdkode        = $temp[4];
 	}
 }
+
+
+// SØK I BOKHYLLA - MITTSYSTEM BLIR BOKHYLLA
+if ((isset($_REQUEST['dobokhylla'])) && ((int) $_REQUEST['dobokhylla'] == "1")) { // vi skal vise treff fra Bokhylla
+	$mittsystem = "bokhylla";
+}
+
 
 
 // Jukse til søkeord
@@ -108,6 +116,12 @@ if ($mittsystem == 'koha') { // frasesøk i Koha
 	$sokeord = urlencode($sokeord);
 }
 
+if ($mittsystem == 'bokhylla') {
+	$sokeord = utf8_decode($sokeord);
+	$sokeord = str_replace(" ", "+AND+", trim($sokeord)); // Dette er semi-frasesøk
+}
+
+
 // This is where it happens
 
 // HTML template for one item
@@ -142,6 +156,12 @@ if ($mittsystem == 'koha') {
 	}
 	$treffliste   = koha_sok($url, $posisjon);
 	$antallfunnet = koha_antalltreff($url);
+}
+
+if ($mittsystem == 'bokhylla') {
+	$url = "http://www.nb.no/services/search/v2/search?q=" . $sokeord . "&fq=mediatype:(B%C3%B8ker)&fq=contentClasses:(bokhylla%20OR%20public)&fq=digital:Ja&itemsPerPage=" . $makstreff;
+	$treffliste = bokhylla_sok($url , $posisjon);
+	$antallfunnet = bokhylla_antalltreff($url);
 }
 
 
@@ -234,7 +254,7 @@ if ($antallfunnet > 0) { // kan være tom
 
 if (stristr($_SERVER['QUERY_STRING'] , "enkeltposturl")) { // Vi har det i referer, overstyrer den vi hadde
 	$dump = stristr ($_SERVER['QUERY_STRING'] , "enkeltposturl="); // fra enkelposturl og ut;
-	if (stristr("&" , $dump)) { // flere vars?
+	if (stristr($dump , "&")) { // flere vars?
 		$dump = stristr ($dump , "&", TRUE) ; // fram til FØRSTE "&"
 	}
 	if (stristr($dump, "&")) { // & må vi rett og slett bare fjerne - kan være noen etterpå også!
@@ -243,26 +263,28 @@ if (stristr($_SERVER['QUERY_STRING'] , "enkeltposturl")) { // Vi har det i refer
 	$enkeltposturl = base64_decode(urldecode(str_replace ("enkeltposturl=" , "" , $dump)));
 }
 
-if ((isset($enkeltposturl)) && ($enkeltposturl != "")) { // det finnes en url til side hvor enkeltposter skal vises
-	if (is_array($treffliste) && count($treffliste)) {
-		foreach ($treffliste as $mangetreff => &$etttreff) { // for hvert treff i trefflista
-			$etttreff['biblioteksystem'] = $mittsystem;
-			if ($mittsystem == "koha") { // Hvis koha - pøs all treffinfo inn i URL
-				$treffinfo             = base64_encode(serialize($etttreff));
-			} else { // men hvis ikke sender vi postID, bibtype, avdelingskode
-				$enkelinfo['bibsystem'] = $mittsystem;
-				$enkelinfo['postid'] = $etttreff['identifier'];
-				$enkelinfo['bibkode'] = $minbibkode;
-				$treffinfo             = base64_encode(serialize($enkelinfo));
+if ($mittsystem != 'bokhylla') { // Meningsløst med enkeltpostvisning ved søk bare i Bokhylla
+	if ((isset($enkeltposturl)) && ($enkeltposturl != "")) { // det finnes en url til side hvor enkeltposter skal vises
+		if (is_array($treffliste) && count($treffliste)) {
+			foreach ($treffliste as $mangetreff => &$etttreff) { // for hvert treff i trefflista
+				$etttreff['biblioteksystem'] = $mittsystem;
+				if ($mittsystem == "koha") { // Hvis koha - pøs all treffinfo inn i URL
+					$treffinfo             = base64_encode(serialize($etttreff));
+				} else { // men hvis ikke sender vi postID, bibtype, avdelingskode
+					$enkelinfo['bibsystem'] = $mittsystem;
+					$enkelinfo['postid'] = $etttreff['identifier'];
+					$enkelinfo['bibkode'] = $minbibkode;
+					$treffinfo             = base64_encode(serialize($enkelinfo));
+				}
+	
+				if(stristr($enkeltposturl , "?")) { // Har allerede query variables
+					$etttreff['permalink'] = $enkeltposturl . "&system=" . $mittsystem . "&enkeltpostinfo=" . $treffinfo;
+				} else { // Dette er den første
+					$etttreff['permalink'] = $enkeltposturl . "?system=" . $mittsystem . "&enkeltpostinfo=" . $treffinfo;
+				}	
+	
+				$etttreff['url'] = $etttreff['permalink']; // vil gjerne bruke disse om hverandre
 			}
-
-			if(stristr($enkeltposturl , "?")) { // Har allerede query variables
-				$etttreff['permalink'] = $enkeltposturl . "&system=" . $mittsystem . "&enkeltpostinfo=" . $treffinfo;
-			} else { // Dette er den første
-				$etttreff['permalink'] = $enkeltposturl . "?system=" . $mittsystem . "&enkeltpostinfo=" . $treffinfo;
-			}	
-
-			$etttreff['url'] = $etttreff['permalink']; // vil gjerne bruke disse om hverandre
 		}
 	}
 }
@@ -282,6 +304,8 @@ if ($antallfunnet > 0) { // kan være tom
 			'aar' => ((isset($treff['utgittaar'])) && ($treff['utgittaar'] != '') ? $treff['utgittaar'] : false),
 			'url' => $treff['permalink'],
 			'opphav' => (isset($treff['opphav']) ? $treff['opphav'] : ''),
+			'ansvarsangivelse' => (isset($treff['ansvarsangivelse']) ? $treff['ansvarsangivelse'] : ''),
+			'status' => (isset($treff['status']) ? $treff['status'] : ''),
 			'materialtype' => $treff['type'],
 			// Set empty default values to avoid 'undefined index' errors
 			'isbn' => '',
@@ -297,15 +321,15 @@ if ($antallfunnet > 0) { // kan være tom
 			if ((isset($treff['heftetbundet'])) && (trim($treff['heftetbundet']) != "")) {
 				$altmedisbn .= " (" . $treff['heftetbundet'] . ")";
 			}
-			$data['isbn'] = "<strong>ISBN: </strong>" . $altmedisbn . "<br>\n";
+			$data['isbn'] = "<strong>ISBN: </strong>" . $altmedisbn . "\n";
 		}
 
 		if ((isset($treff['omfang'])) && (trim($treff['omfang']) != "")) {
-			$data['omfang'] = "<strong>Omfang: </strong>" . $treff['omfang'] . "<br>\n";
+			$data['omfang'] = "<strong>Omfang: </strong>" . $treff['omfang'];
 		}
 
 		if ((isset($treff['originaltittel'])) && (trim($treff['originaltittel']) != "")) {
-			$data['titteloriginal'] = "<strong>Originaltittel: </strong>" . $treff['originaltittel'] . "<br>\n";
+			$data['titteloriginal'] = "<strong>Originaltittel: </strong>" . $treff['originaltittel'] . "\n";
 		}
 
 
@@ -339,7 +363,6 @@ if ($antallfunnet > 0) { // kan være tom
 				}
 
 			$totaleks = (int)$tilgjengelig + (int)$begrenset + (int)$utlant + (int)$utilgjengelig;
-
 			$bestandhtml = "<br>\n";
 			if ($tilgjengelig > 0) {
 				$data['status'] = 'ledig';
@@ -463,7 +486,6 @@ if ($antallfunnet > 0) { // kan være tom
 		// RYDD OPP I UBRUKTE STRENGER - FJERN DEM!!
 
 		$results[] = $data;
-
 	}
 }
 else

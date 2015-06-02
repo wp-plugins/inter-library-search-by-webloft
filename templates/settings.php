@@ -8,6 +8,7 @@ $hamedbilder = get_option('wl_ils_option_hamedbilder' , '0');
 $makstreff = get_option('wl_ils_option_makstreff' , '0');
 $bibsysbestand = get_option('wl_ils_option_bibsysbestand' , '0');
 $enkeltpost = get_option('wl_ils_option_enkeltpost' , '');
+$treffbokhylla = get_option('wl_ils_option_treffbokhylla' , '');
 
 include(dirname(__FILE__).'/../serverliste.php');
 
@@ -105,6 +106,13 @@ if ($post_query = get_posts($args)) {
             <label for="wl_ils_option_hamedbilder">Vise omslagsbilder i det hele tatt (fjern hake for &aring; droppe alle omslagsbilder)?</label>
             <input name="wl_ils_option_hamedbilder" type="checkbox" value="1" <?php checked( '1', $hamedbilder ); ?> />
             <br>
+        </p>
+
+		<h3>Berike treffliste</h3>
+
+		<p>
+            <label for="wl_ils_option_treffbokhylla">Vise knapp for &aring; hoppe mellom treff i Bokhylla og i katalogen?</label>
+            <input name="wl_ils_option_treffbokhylla" type="checkbox" value="1" <?php if ($treffbokhylla == "1") { echo "checked";} ?> />
         </p>
 
         <h2>Innstillinger for Bibsys-bibliotek</h2>

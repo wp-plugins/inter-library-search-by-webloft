@@ -26,6 +26,7 @@
             Omslag fra NB : <?= ($omslagnb == "1" ? 'JA' : 'NEI' ) ?><br>
             Bestand fra Bibsys : <?= ($bibsysbestand == "1" ? 'JA' : 'NEI' ) ?><br>
             URL til denne iframe : <?= $_SERVER['REQUEST_URI'] ?><br>
+			Hente treff fra Bokhylla : <?= ($treffbokhylla == "1" ? 'JA' : 'NEI' ) ?><br>
         </span>
 <?php endif; ?>
 
@@ -33,10 +34,23 @@
 <?php if (count($results)): ?>
 
         <div id="divreglitreframeFrameHolder" style="display:block;">
-            <div class="reglitre_results">
-
+            
                 <?php include 'results-pager.php'; ?>
 
+		<?php
+		if ($treffbokhylla == 1) { // Bare hvis dette er valgt i options
+			$dobokhylla = (int) $_REQUEST['dobokhylla'];
+			if ($dobokhylla == 1) {
+				$switchlink = str_replace ("dobokhylla=1" , "dobokhylla=0", $_SERVER['REQUEST_URI']);
+				$switchlink .= "&posisjon=1";
+				echo "<button class=\"bigfat\" onclick=\"showreglitreframeLoading();location.href='" . $switchlink . "'\">G&aring; tilbake til katalogen</button>";
+			} else {
+				$switchlink = str_replace ("dobokhylla=0" , "dobokhylla=1", $_SERVER['REQUEST_URI']);
+				$switchlink .= "&posisjon=1";
+				echo "<button class=\"bigfat\" onclick=\"showreglitreframeLoading();location.href='" . $switchlink . "'\">S&oslash;k i Bokhylla i stedet!</button>";
+			}
+		}	
+		?>
 
                 <ul class="ils-results">
 
@@ -60,7 +74,11 @@
                                         Online
                                     </a>
                                 <?php endif; ?>
-                                <?= $result['bestand'] ?>
+                                <?php 
+								if (isset($result['bestand'])) {
+									echo $result['bestand'];
+								}
+								?>
                             </span>
                         </div>
 <?php endif; ?>
@@ -72,31 +90,38 @@
                                 <?php endif; ?>
                             </a>
                         </h3>
+						<div class="ansvar"><?= $result['opphav'] ?></div>	
+						<p>
+						<?php
+						$tekstbody[] = trim($result['description']);
+						$tekstbody[] = trim($result['utdrag']);
+						$tekstbody[] = trim($result['titteloriginal']);
+						$tekstbody[] = trim($result['isbn']);
+						$tekstbody[] = trim($result['omfang']);
+						$tekstbody[] = trim($result['dewey']);
+						foreach ($tekstbody as $onepiece) {
+							if (trim($onepiece) != '') {
+								echo $onepiece . "<br>";
+							}
+						}
+						unset ($tekstbody);
+						?>
+                        </p>
+
                         <div class="status">
-<?php if ($result['status'] == 'ledig'): ?>
-                            Ledig <div class="green dot"></div>
-<?php elseif ($result['status'] == 'ledig'): ?>
-                            Utlånt e.l. <div class="orange dot"></div>
-<?php elseif ($result['status'] == 'ikke-ledig'): ?>
-                            Ikke ledig <div class="red dot"></div>
-<?php else: ?>
-                            Uklar bestand <div class="orange dot"></div>
-<?php endif; ?>
+							<?php if ($result['status'] == 'ledig'): ?>
+                            	Ledig <div class="green dot"></div>
+							<?php elseif ($result['status'] == 'ledig'): ?>
+                            	Utlånt e.l. <div class="orange dot"></div>
+							<?php elseif ($result['status'] == 'bokhylla'): ?>
+                            	Online i Bokhylla <div class="green dot"></div>
+							<?php elseif ($result['status'] == 'ikke-ledig'): ?>
+                            	Ikke ledig <div class="red dot"></div>
+							<?php else: ?>
+                            	Uklar bestand <div class="orange dot"></div>
+							<?php endif; ?>
 
                         </div>
-                        <span class="opphav">
-                            <?= $result['opphav'] ?>
-                        </span>
-                        <p>
-                            <?= $result['description'] ?>
-                            <?= $result['utdrag'] ?>
-                        </p>
-                        <p>
-                            <?= $result['titteloriginal'] ?>
-                            <?= $result['isbn'] ?>
-                            <?= $result['omfang'] ?>
-                            <?= $result['dewey'] ?>
-                        </p>
 
                         <div style="clear:both;"></div>
                     </li>
@@ -108,13 +133,10 @@
                     <?php include 'results-pager.php'; ?>
                 </div>
             </div>
-        </div>
 
 <?php else: ?>
 
-        <div class="reglitre_results">
-            Ingen treff!
-        </div>
+        Ingen treff!
 
 <?php endif; ?>
 

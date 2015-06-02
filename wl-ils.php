@@ -31,6 +31,7 @@ $enkeltbibsysbestand = get_option('wl_ils_option_bibsysbestand' , '0');
 $standardbibliotek = get_option('wl_ils_option_mittbibliotek' , '0');
 $omslagbokkilden = get_option('wl_ils_option_omslagbokkilden' , '0');
 $omslagnb = get_option('wl_ils_option_omslagnb' , '0');
+$treffbokhylla = get_option('wl_ils_option_treffbokhylla' , '0');
 $hamedbilder = get_option('wl_ils_option_hamedbilder' , '1');
 $makstreff = get_option('wl_ils_option_makstreff' , '25');
 if (isset($_REQUEST['webloftsok_query'])) {
@@ -61,7 +62,7 @@ if (isset($_REQUEST['enkeltposturl'])) { // kan være satt i widget
 
 // lage URL i tilfelle det er lenket direkte til søkeside
 
-$frameurl = plugins_url('search.php' , __FILE__) . "?mittbibliotek=" . $brukbibliotek . "&omslagbokkilden=" . $omslagbokkilden . "&bibsysbestand=" . $bibsysbestand . "&omslagnb=" . $omslagnb . "&hamedbilder=" . $hamedbilder . "&makstreff=" . $makstreff . "&s=" . $hamedsok . "&enkeltposturl=" . $enkeltposturl;
+$frameurl = plugins_url('search.php' , __FILE__) . "?mittbibliotek=" . $brukbibliotek . "&omslagbokkilden=" . $omslagbokkilden . "&bibsysbestand=" . $bibsysbestand . "&omslagnb=" . $omslagnb . "&hamedbilder=" . $hamedbilder . "&makstreff=" . $makstreff . "&s=" . $hamedsok . "&enkeltposturl=" . $enkeltposturl . "&treffbokhylla=" . $treffbokhylla . "&dobokhylla=0";
 
 if ($hamedsok != '') {
 	$framekode = " src=\"" . $frameurl . "\"";
@@ -381,6 +382,7 @@ function RegisterSettings() {
     add_option("wl_ils_option_makstreff", "25", "", "yes");
     add_option("wl_ils_option_bibsysbestand", "0", "", "yes");
     add_option("wl_ils_option_enkeltpost", "", "", "yes");
+    add_option("wl_ils_option_treffbokhylla", "0", "", "yes");
 
     // Register settings that this form is allowed to update
     register_setting('wl_ils_options', 'wl_ils_option_mittbibliotek');
@@ -390,6 +392,7 @@ function RegisterSettings() {
     register_setting('wl_ils_options', 'wl_ils_option_makstreff');
     register_setting('wl_ils_options', 'wl_ils_option_bibsysbestand');
     register_setting('wl_ils_options', 'wl_ils_option_enkeltpost');
+    register_setting('wl_ils_options', 'wl_ils_option_treffbokhylla');
 }
 
 function wl_ils_settings_page() {

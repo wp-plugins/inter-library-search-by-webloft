@@ -1,6 +1,77 @@
 <?php
 
 //****************************************************************************************************
+function bokhylla_antalltreff($url) { // finner antall treff for et søk
+//****************************************************************************************************
+
+	$xml_datafil = get_content($url);
+	$xml_data    = simplexml_load_string($xml_datafil);
+
+	$feedsubtitle = $xml_data->subtitle;
+	$antallfunnet = substr(stristr($feedsubtitle , " of ") , 4);
+
+	return $antallfunnet;
+} // end function
+
+//****************************************************************************************************
+function bokhylla_sok($url, $posisjon) {
+//****************************************************************************************************
+
+	// Vi må slenge på posisjon i URL-en
+	$url = $url . "&startIndex=" . $posisjon;
+
+	$xml_datafil = get_content($url);
+	$xml_data    = simplexml_load_string($xml_datafil);
+	$hitcounter   = 0;
+	$treff        = '';
+	$omslagsserver = "http://bokforsider.webloft.no";
+
+	foreach ($xml_data->entry as $entry) {
+		// Les inn metadatafil
+		$namespaces = $entry->getNameSpaces(true);
+		$nb = $entry->children($namespaces['nb']); // alle som er nb:ditten og nb:datten
+
+		// ISBN
+		$isbn = $nb->isbn;	
+		if (stristr($isbn , ";")) { // hvis det er flere inneholder strengen semikolon
+			$isbn = trim(stristr($isbn , ";" , TRUE)); // da tar vi det første
+		} else {
+			$isbn = trim ($isbn); // fint som det er. Takk.
+		}
+		$treff[$hitcounter]['isbn'] = $isbn;
+
+		// Omslag og lenke
+		$treff[$hitcounter]['fulltekst'] = "http://urn.nb.no/" . $nb->urn;
+		$treff[$hitcounter]['permalink'] = "http://urn.nb.no/" . $nb->urn;
+		$treff[$hitcounter]['omslag'] = $omslagsserver . "/urn/" . substr(($nb->urn), 8) . ".jpg";
+
+		$treff[$hitcounter]['tittel'] = $entry->title;
+		$treff[$hitcounter]['tittelinfo'] = $entry->title;
+		$treff[$hitcounter]['forfatter'] = $nb->namecreator;
+		$treff[$hitcounter]['ansvarsangivelse'] = $nb->namecreator;
+		$treff[$hitcounter]['opphav'] = $nb->namecreator;
+		$treff[$hitcounter]['type'] = 'bok'; // Nei, sier De virkelig det?
+		$treff[$hitcounter]['status'] =	'bokhylla'; 
+
+		$treff[$hitcounter]['utgittaar'] = $nb->year;
+		
+		$beskrivelse = $entry->summary;
+		$beskrivelse   = preg_replace('/[ \t]+/', ' ', preg_replace('/[\r\n]+/', "\n", $beskrivelse)); // fjerne tabs, mellomrom...
+		$treff[$hitcounter]['beskrivelse'] = $beskrivelse;
+		
+		$tempemneord = explode (";" , $nb->subjecttopic);
+		foreach ($tempemneord as $ettemne) {
+			$emneord[] = $ettemne;
+		}
+		$treff[$hitcounter]['emneord'] = $emneord;
+
+	$hitcounter++;
+	}
+
+	return ($treff);
+} // end function
+
+//****************************************************************************************************
 function koha_antalltreff($url) { // finner antall treff for et søk
 //****************************************************************************************************
 
@@ -1136,9 +1207,7 @@ function bibsys_sok($url, $avdkode, $hamedbibsys, $posisjon) { // url til søk, 
 		$bibsysstreng      = implode("&", $bibsystocheck);
 		$tilgjengelig      = "http://alfa-a.bibsys.no/services/json/availabilityService.jsp?" . $bibsysstreng;
 		$hvaertilgjengelig = json_decode(get_content($tilgjengelig));
-//domp ($hvaertilgjengelig);
 		foreach ($hvaertilgjengelig->list->documents as $ettdokument) {
-//rop ($ettdokument->bibcode);
 			if ($ettdokument->bibcode == $avdkode) {
 				$targetdokumenter[] = $ettdokument; // Hvis vår avdkode vil vi ha den
 			}
