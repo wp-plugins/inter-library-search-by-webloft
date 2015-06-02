@@ -3,7 +3,7 @@ Contributors: sundaune
 Tags: bibliotek, katalog, inter library search, search, søk, søking, søkemotor, bibliotekkatalog, bibliofil, bibsys, koha, metasøk, library, bibvenn, webekspertene, webløft, webloft, e-bok, ebok, e-book, e-books
 Requires at least: 4.0
 Tested up to: 4.2
-Stable tag: 2.2
+Stable tag: 2.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -15,7 +15,7 @@ This plugin enables a shortcode that lets you insert a search form to search the
 
 Custom options include whether to search for book covers and check item availability on the fly. The output is easily customizable (if you know CSS) by editing the included style sheets.
 
-The plugin currently supports Bibsys, Bibliofil, Koha and Tidemann.
+The plugin currently supports Bibsys, Bibliofil, Koha and Tidemann. It also support searching free online books from the National Library (Bokhylla).
 
 NORWEGIAN:
 
@@ -23,7 +23,7 @@ Dette innstikket installerer en kortkode som lar deg sette inn et søkeskjema so
 
 Innstillingene inkluderer muligheten for å finne bokomslag forskjellige steder og å sjekke bestand for hver bok før treffene vises. Utseendet kan enkelt tilpasses (hvis du kan CSS) ved å redigere de medfølgende stilarkene.
 
-Innstikket har for tiden støtte for Bibsys, Bibliofil, Koha og Tidemann.
+Innstikket har for tiden støtte for Bibsys, Bibliofil, Koha og Tidemann. Det støtter også oppslag i gratis tilgjengelige bøker på nett fra Nasjonalbiblioteket (Bokhylla)
 
 == Installation ==
 
@@ -135,6 +135,10 @@ NORWEGIAN:
 
 == Change log ==
 
+= 2.3 = 
+
+* Feature: Now possible to find free books available online from the National Library (bokhylla.no)
+
 = 2.2 =
 
 * Bugfix: Widget now works with displaying single post on its own page
@@ -196,6 +200,10 @@ NORWEGIAN:
 * First version
 
 NORWEGIAN:
+
+= 2.3 = 
+
+* Nytt: Nå mulig å søke blant gratis bøker tilgjengelig på nett fra Nasjonalbiblioteket (Bokhylla)
 
 = 2.2 =
 

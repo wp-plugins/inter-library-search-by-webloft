@@ -3,6 +3,12 @@
 $forrigelink = $_SERVER['REQUEST_URI'] . "&posisjon=" . ($posisjon - $treffperside);
 $nestelink   = $_SERVER['REQUEST_URI'] . "&posisjon=" . ($posisjon + $treffperside);
 
+if ($mittsystem == "bokhylla") {
+	$ibokhylla = " i Bokhylla ";
+} else {
+	$ibokhylla = " ";
+}
+
 $forrigeposisjon = ($posisjon - $treffperside);
 $nesteposisjon   = ($posisjon + $treffperside - 1);
 if ($nesteposisjon > $antallfunnet) {
