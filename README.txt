@@ -3,7 +3,7 @@ Contributors: sundaune
 Tags: bibliotek, katalog, inter library search, search, søk, søking, søkemotor, bibliotekkatalog, bibliofil, bibsys, koha, metasøk, library, bibvenn, webekspertene, webløft, webloft, e-bok, ebok, e-book, e-books
 Requires at least: 4.0
 Tested up to: 4.2
-Stable tag: 2.0.4
+Stable tag: 2.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -11,23 +11,23 @@ Search different library catalogs from within your own site. Norwegian: Søk i b
 
 == Description ==
 
-This plugin enables a shortcode that lets you insert a search form to search the library catalogue of your choice - and the hits are displayed inline in your own site. You also have the option to display single posts on the page or post of your liking, as well as inserting the search form in the form of a widget anywhere on your site and sending the results to the post or page you prefer. 
+This plugin enables a shortcode that lets you insert a search form to search the library catalogue of your choice - and the hits are displayed inline in your own site. You also have the option to display single posts on the page or post of your liking, as well as inserting the search form in the form of a widget anywhere on your site and sending the results to the post or page you prefer.
 
-Custom options include whether to search for book covers and check item availability on the fly. The output is easily customizable (if you know CSS) by editing the included style sheets. 
+Custom options include whether to search for book covers and check item availability on the fly. The output is easily customizable (if you know CSS) by editing the included style sheets.
 
-The plugin currently supports Bibsys, Bibliofil, Koha and Tidemann.
+The plugin currently supports Bibsys, Bibliofil, Koha and Tidemann. It also support searching free online books from the National Library (Bokhylla).
 
 NORWEGIAN:
 
 Dette innstikket installerer en kortkode som lar deg sette inn et søkeskjema som søker i en valgfri bibliotekkatalog - og viser treffene inne i din egen hjemmeside. Du kan altså vise enkeltposter innbakt i en side eller et innlegg som du velger selv, og du kan sette inn søkeskjemaet som en widget hvor som helst på siden din - og sende treffene til en hvilken som helst side eller innlegg!
 
-Innstillingene inkluderer muligheten for å finne bokomslag forskjellige steder og å sjekke bestand for hver bok før treffene vises. Utseendet kan enkelt tilpasses (hvis du kan CSS) ved å redigere de medfølgende stilarkene. 
+Innstillingene inkluderer muligheten for å finne bokomslag forskjellige steder og å sjekke bestand for hver bok før treffene vises. Utseendet kan enkelt tilpasses (hvis du kan CSS) ved å redigere de medfølgende stilarkene.
 
-Innstikket har for tiden støtte for Bibsys, Bibliofil, Koha og Tidemann.
+Innstikket har for tiden støtte for Bibsys, Bibliofil, Koha og Tidemann. Det støtter også oppslag i gratis tilgjengelige bøker på nett fra Nasjonalbiblioteket (Bokhylla)
 
 == Installation ==
 
-= Uploading the plugin via the Wordpress control panel = 
+= Uploading the plugin via the Wordpress control panel =
 
 Make sure you have downloaded the .zip file containing the plugin. Then:
 
@@ -45,9 +45,9 @@ Make sure you have downloaded the .zip file containing the plugin. Then:
 2. Upload the folder 'webloft-ils' to the '/wp-content/plugins/' folder (or wherever you store your plugins)
 3. Activate the plugin from the control panel
 
-... Or install it via the Wordpress repository! 
+... Or install it via the Wordpress repository!
 
-= Usage = 
+= Usage =
 
 To use the search function in the simplest way, just insert the following shortcode in a post/page:
 
@@ -57,7 +57,7 @@ The search form will then be inserted, and search the library catalogue you have
 
 [wl-ils mittbibliotek=CODE]
 
-... where CODE is taken from the table of codes available from the settings page. When the user enters a search terms and hits Enter or clicks OK, the results will appear directly beneath in an automatically expanding iframe. You can also display the search form as a widget in widgetized areas of your site (side bars, header, footer etc.). In this case you have to choose which page or post to send the results to. You do this from the widget settings - Webloft ILS will automatically scan all posts and pages, and let you choose from the ones containing the [wl-ils] shortcode. 
+... where CODE is taken from the table of codes available from the settings page. When the user enters a search terms and hits Enter or clicks OK, the results will appear directly beneath in an automatically expanding iframe. You can also display the search form as a widget in widgetized areas of your site (side bars, header, footer etc.). In this case you have to choose which page or post to send the results to. You do this from the widget settings - Webloft ILS will automatically scan all posts and pages, and let you choose from the ones containing the [wl-ils] shortcode.
 
 Display of single items
 
@@ -65,7 +65,7 @@ If you do not want your users to exit your site and be taken to the library syst
 
 [wl-ils-enkeltpost]
 
-You must also activate the setting on the plugin's settings page - Webloft ILS will scan all posts/pages and let you choose from the ones containing the [wl-ils-enkeltpost] shortcode. When this option is activated, your users will be taken to this post/page when clicking an item in the result list, and the shortcode on that page will be replaced with information about the item as well as availability information and links to reserve, order or read the item online where applicable. The URL to this page/post (allthough preposterously long!) can be used as a direct link this item. 
+You must also activate the setting on the plugin's settings page - Webloft ILS will scan all posts/pages and let you choose from the ones containing the [wl-ils-enkeltpost] shortcode. When this option is activated, your users will be taken to this post/page when clicking an item in the result list, and the shortcode on that page will be replaced with information about the item as well as availability information and links to reserve, order or read the item online where applicable. The URL to this page/post (allthough preposterously long!) can be used as a direct link this item.
 
 NORWEGIAN:
 
@@ -89,7 +89,7 @@ Sørg for at du har lastet ned ZIP-filen som inneholder innstikket. Deretter:
 
 --- Eller installér det via Wordpress-katalogen!
 
-= Bruk = 
+= Bruk =
 
 For å bruke søkeskjemaet på enkelste måte kan du bare sette inn følgende kortkode på en side eller i et innlegg:
 
@@ -99,7 +99,7 @@ Da vil et søkeskjema bli satt inn, som søker i den bibliotekkatalogen du har a
 
 [wl-ils mittbibliotek=KODE]
 
-... hvor KODE er hentet fra tabellen med bibliotekkoder som er tilgjengelig fra siden med innstillinger. Når brukeren skriver inn en søketerm og trykker Enter eller klikker OK vil resultatene vises rett under, i en iframe som ekspanderer automatisk til antallet treff. 
+... hvor KODE er hentet fra tabellen med bibliotekkoder som er tilgjengelig fra siden med innstillinger. Når brukeren skriver inn en søketerm og trykker Enter eller klikker OK vil resultatene vises rett under, i en iframe som ekspanderer automatisk til antallet treff.
 
 Du kan også vise søkeskjemaet som en widget hvis nettstedet ditt har støtte for slike (på siden, på toppen, i bunnen osv.). Da må du i tilfelle angi hvilken side eller hvilket innlegg resultatene skal sendes til. Dete gjøres i widgetens innstillinger - Webloft ILS vil automatisk lete gjennom alle sider og innlegg for å la deg velge blant de som inneholder kortkoden [wl-ils].
 
@@ -109,7 +109,7 @@ Hvis du ikke vil sende brukerne ut av siden din når de klikker på et treff, ka
 
 [wl-ils-enkeltpost]
 
-Du må også aktivere denne innstillingen på innstikkets innstillingsside - Webloft ILS vil lete gjennom alle sider/innlegg og la deg velge blant dem som inneholder kortkoden [wl-ils-enkeltpost]. Når denne innstillingen er påslått vil brukerne tas til denne siden eller dette innlegget når de klikker på et treff, og kortkoden vil her bli erstattet av en faktaboks med informasjon om treffet såvel som bestand, lenker til reservering, bestilling og online-tilgang der dette finnes. URL-en til denne siden kan (selv om den er forferdelig lang!) deles som en direkte lenke til denne posten.  
+Du må også aktivere denne innstillingen på innstikkets innstillingsside - Webloft ILS vil lete gjennom alle sider/innlegg og la deg velge blant dem som inneholder kortkoden [wl-ils-enkeltpost]. Når denne innstillingen er påslått vil brukerne tas til denne siden eller dette innlegget når de klikker på et treff, og kortkoden vil her bli erstattet av en faktaboks med informasjon om treffet såvel som bestand, lenker til reservering, bestilling og online-tilgang der dette finnes. URL-en til denne siden kan (selv om den er forferdelig lang!) deles som en direkte lenke til denne posten.
 
 == Frequently Asked Questions ==
 
@@ -134,6 +134,25 @@ NORWEGIAN:
 2. Visning av enkeltpost
 
 == Change log ==
+
+= 2.3 = 
+
+* Feature: Now possible to find free books available online from the National Library (bokhylla.no)
+
+= 2.2 =
+
+* Bugfix: Widget now works with displaying single post on its own page
+* Cleanup: Functions code no longer conflicts with other addons
+* Visual: Fixed social media icons for sharing single posts
+
+= 2.1.1 =
+
+* Should no longer require the PEAR_Exception class
+
+= 2.1 =
+
+* Code rewrite to simplify a bit
+* Responsive layout for mobile phones and tablets
 
 = 2.0.4 = 
 
@@ -164,13 +183,13 @@ NORWEGIAN:
 * Feature: Now possible to link directly to single items from the outside
 * Bugfix: URI sometimes too long for browser when sending availability data in the query string (414 error)
 
-= 1.2 = 
+= 1.2 =
 
-* A LOT of additional info on each item (020$b,082$a,100$d,245$c,300$a/b,500$a,505$a,511$a,574$a,650$a,740$a etc.) 
+* A LOT of additional info on each item (020$b,082$a,100$d,245$c,300$a/b,500$a,505$a,511$a,574$a,650$a,740$a etc.)
 * Tab based view of single post information
 * Code optimalization
 
-= 1.1 = 
+= 1.1 =
 
 * Bugfix "costa rica": Pagination when search query contains several words not inside quotes
 * Bugfix: Treat search for several words as [word1 AND word2], not OR
@@ -182,6 +201,25 @@ NORWEGIAN:
 
 NORWEGIAN:
 
+= 2.3 = 
+
+* Nytt: Nå mulig å søke blant gratis bøker tilgjengelig på nett fra Nasjonalbiblioteket (Bokhylla)
+
+= 2.2 =
+
+* Bugfix: Widget fungerer nå selv når man skal vise enkeltposter på en egen side
+* Opprydning: Koden med funksjoner vil ikke havne i konflikt med andre utvidelser
+* Visuelt: Fikset ikonene for å dele enkeltposter på sosiale media
+
+= 2.1.1 =
+
+* Skal ikke lenger være avhengig av PEAR_Exception-klassen
+
+= 2.1 =
+
+* Skrevet om koden for å forenkle litt
+* Responsivt design, layout tilpasset mobiltelefoner og nettbrett
+
 = 2.0.4 = 
 
 * Bugfix: Fikset Moss bibliotek
@@ -191,7 +229,7 @@ NORWEGIAN:
 
 * Bugfix: Widget omdirigerte ikke til riktig side for å vise trefflisten
 
-= 2.0.2 = 
+= 2.0.2 =
 
 * Widget: Mulighet for å velge hvilket biblioteks katalog det skal søkes i for hver enkelt widget
 * Kortkode: Mulighet for å velge bibliotek-katalog i kortkode ved hjelp av "mittbibliotek"-parameteret
@@ -204,7 +242,7 @@ NORWEGIAN:
 * Lagt til støtte for Tidemann
 * Bugfix: Beskrivelse kom ikke med i delingsvinduet for Facebook
 
-= 1.3 = 
+= 1.3 =
 
 * Bugfix: Søkestrengen ble ikke med over fra widget til søkeside
 * Forbedring: Lagt til Twitter- og Facebook-knapper for å dele enkeltposter
@@ -213,7 +251,7 @@ NORWEGIAN:
 
 = 1.2 =
 
-* MYE mer informasjon om hvert enkelt treff (020$b,082$a,100$d,245$c,300$a/b,500$a,505$a,511$a,574$a,650$a,740$a etc.) 
+* MYE mer informasjon om hvert enkelt treff (020$b,082$a,100$d,245$c,300$a/b,500$a,505$a,511$a,574$a,650$a,740$a etc.)
 * Fanebasert visning av informasjon for enkelttreff
 * Kodeoptimalisering
 

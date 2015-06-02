@@ -1,7 +1,7 @@
 <?php
 
 // Hent alle innlegg (og sider samtidig?)
-// Lagre id og tittel der hvor [reglitre] forekommer
+// Lagre id og tittel der hvor [wl-ils] forekommer
 
 $args = array(
 'post_type' => array('post' , 'page'),
