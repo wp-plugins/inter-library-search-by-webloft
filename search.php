@@ -2,8 +2,8 @@
 
 $reglitre_debug = 0; // Sett til 1 for debug
 
-/*
 // turn on for debug
+/*
 ini_set('display_startup_errors',1);
 ini_set('display_errors',1);
 error_reporting(-1);
@@ -17,7 +17,7 @@ Tilgjengelighet i Bibsys!
 http://discovery.bibsys.no/tag/json/
 http://www.bibsys.no/files/out/biblev/utlaanstatus-marc21.pdf - forklarer kodene
 
-CURL dokumentasjon: 
+CURL dokumentasjon:
 http://semlabs.co.uk/journal/object-oriented-curl-class-with-multi-threading
 
 
@@ -32,6 +32,7 @@ require_once("systemer.php"); // forskjellige bib.systemers måte å søke på
 require_once("functions.php"); // funksjoner vi har bruk for
 
 $mittbibliotek   = stripslashes(strip_tags($_REQUEST['mittbibliotek']));
+
 if (isset($_REQUEST['enkeltposturl'])) {
 	$enkeltposturl   = base64_decode(urldecode($_REQUEST['enkeltposturl']));
 }
@@ -39,7 +40,8 @@ $omslagbokkilden = stripslashes(strip_tags($_REQUEST['omslagbokkilden']));
 $omslagnb        = stripslashes(strip_tags($_REQUEST['omslagnb']));
 $hamedbilder     = stripslashes(strip_tags($_REQUEST['hamedbilder']));
 $bibsysbestand   = stripslashes(strip_tags($_REQUEST['bibsysbestand']));
-$sokeord         = trim(stripslashes(strip_tags($_REQUEST['s'])));
+$treffbokhylla   = (int) ($_REQUEST['treffbokhylla']);
+$sokeord         = trim(stripslashes(strip_tags($_REQUEST['wl_ils_s'])));
 if (isset($_REQUEST['posisjon'])) {
 	$posisjon = (int) ($_REQUEST['posisjon']);
 } else {
@@ -68,30 +70,15 @@ foreach ($bibliotek as $ettbibliotek) {
 	}
 }
 
-?>
 
-<!doctype html>
+// SØK I BOKHYLLA - MITTSYSTEM BLIR BOKHYLLA
+if ((isset($_REQUEST['dobokhylla'])) && ((int) $_REQUEST['dobokhylla'] == "1")) { // vi skal vise treff fra Bokhylla
+	$mittsystem = "bokhylla";
+}
 
-<html lang="no">
-<head>
-  <meta charset="utf-8">
 
-  <title>Treffliste</title>
 
-<link href='http://fonts.googleapis.com/css?family=Muli' rel='stylesheet' type='text/css'>
-<link rel="stylesheet" href="results.css">
-<script type="text/javascript" src="js/hideframeonload.js"></script>
-
-</head>
-
-<body onLoad="hidereglitreframeLoading();">
-<div id="divreglitreframeLoading" style="text-align: center; margin-top: 20px;">
-<img style="border: none; box-shadow: none;" src="icons/zzz.png" alt="Laster..." />
-</div>
-
-<?php
-
-// Jukse til søkeord 
+// Jukse til søkeord
 
 $sokeord = str_replace(", ", ",", $sokeord); // fjerne mellomrom i invertert form
 
@@ -129,36 +116,16 @@ if ($mittsystem == 'koha') { // frasesøk i Koha
 	$sokeord = urlencode($sokeord);
 }
 
+if ($mittsystem == 'bokhylla') {
+	$sokeord = utf8_decode($sokeord);
+	$sokeord = str_replace(" ", "+AND+", trim($sokeord)); // Dette er semi-frasesøk
+}
+
+
 // This is where it happens
 
 // HTML template for one item
 
-$singlehtml = '<tr>' . "\n";
-$singlehtml .= '<td class="row-pendelString">' . "\n";
-if ($hamedbilder == "1") { // skal vi egentlig vise bilder i det hele tatt, sånn i følge innstillingene?
-	$singlehtml .= '<a target="_blank" href="urlString">' . "\n";
-	$singlehtml .= '<img class="omslag" src="omslagString" alt="tittelString" />' . "\n";
-	$singlehtml .= '</a>' . "\n";
-}
-$singlehtml .= '<h3><a target="_blank" href="urlString">tittelString</a> (aarString)</h3>' . "\n";
-$singlehtml .= '<span class="opphav">opphavString</span>' . "\n";
-$singlehtml .= '<p>descriptionStringutdragString</p>';
-$singlehtml .= '<p>' . "\n";
-$singlehtml .= 'titteloriginalString' . "\n";
-$singlehtml .= 'isbnString' . "\n";
-$singlehtml .= 'omfangString' . "\n";
-$singlehtml .= 'deweyString' . "\n";
-$singlehtml .= '</p>' . "\n";
-$singlehtml .= '</td>' . "\n";
-if (($mittsystem != 'koha') && ($mittsystem != 'tidemann')) { // koha og tidemann har ikke materialtype, da dropper vi denne 
-	$singlehtml .= '<td class="row-pendelString" style="text-align: center;">' . "\n";
-	$singlehtml .= '<img class="materialtype" src="icons/materialtypeString.png" alt="materialtypeString" /><br>' . "\n";
-	$singlehtml .= '<span class="materialtype">materialtypeString</span>' . "\n";
-	$singlehtml .= 'onlineString' . "\n";
-	$singlehtml .= 'bestandString' . "\n";
-	$singlehtml .= '</td>' . "\n";
-}
-$singlehtml .= '</tr>' . "\n\n";
 
 // OK, skru sammen URL for søk
 
@@ -179,7 +146,7 @@ if ($mittsystem == 'bibliofil') {
 if ($mittsystem == 'bibsys') {
 	$url          = "http://sru.bibsys.no/search/biblio?operation=searchRetrieve&version=1.2&maximumRecords=" . $makstreff . "&query=" . $sokeord . "%20and%20bs.bibkode=" . $minbibkode;
 	$treffliste   = bibsys_sok($url, $minbibkode, $bibsysbestand, $posisjon);
-	$antallfunnet = bibsys_antalltreff($url, $minavdkode); 
+	$antallfunnet = bibsys_antalltreff($url, $minavdkode);
 }
 
 if ($mittsystem == 'koha') {
@@ -191,6 +158,12 @@ if ($mittsystem == 'koha') {
 	$antallfunnet = koha_antalltreff($url);
 }
 
+if ($mittsystem == 'bokhylla') {
+	$url = "http://www.nb.no/services/search/v2/search?q=" . $sokeord . "&fq=mediatype:(B%C3%B8ker)&fq=contentClasses:(bokhylla%20OR%20public)&fq=digital:Ja&itemsPerPage=" . $makstreff;
+	$treffliste = bokhylla_sok($url , $posisjon);
+	$antallfunnet = bokhylla_antalltreff($url);
+}
+
 
 // FINNE OMSLAGSBILDER
 
@@ -199,12 +172,13 @@ if ($mittsystem == 'koha') {
 // 3. osv
 
 
+
 if ($antallfunnet > 0) { // kan være tom
-	
+
 	if ($hamedbilder == "1") { // bare hvis innstillingen "ha med bilder i det hele tatt" er satt
-		
+
 		foreach ($treffliste as $enkelttreff => &$treff) {
-			
+
 			// Det enkleste er å bruke vår egen server hvis vi har ISBN
 			if ((isset($treff['isbn'])) && (!isset($treff['omslag']))) { // vi har ISBN men ikke omslag
 				$tempisbn = str_replace(" ", "", $treff['isbn']); // fjerne mellomrom
@@ -222,15 +196,15 @@ if ($antallfunnet > 0) { // kan være tom
 					}
 				}
 			}
-			
+
 			// Hvis denne innstillingen er slått på og vi fortsatt ikke har omslag
-			
+
 			if (($omslagbokkilden == "1") && (!isset($treff['omslag']))) {
-				
+
 				// Finne info fra Bokkilden
-				
+
 				// Hvis vi har ISBN
-				
+
 				if (!empty($treff['isbn'])) {
 					$isbnsearch      = "http://partner.bokkilden.no/SamboWeb/partner.do?format=XML&uttrekk=5&ept=3&xslId=117&enkeltsok=" . $treff['isbn'];
 					$panda           = get_content($isbnsearch);
@@ -246,9 +220,9 @@ if ($antallfunnet > 0) { // kan være tom
 			// Men det må være bøker (annet finnes jo ikke i NB)
 
 			if (($omslagnb == "1") && (!isset($treff['omslag'])) && (!isset($treff['isbn'])) && ($treff['type'] == "bok")) {
-				
+
 				// Vi søker på tittel og ser hvilke URN-er vi får
-				
+
 				$tittelsok = "http://www.nb.no/services/search/v2/search?q=*&fq=title:%22" . urlencode($treff['tittel']) . "%22&fq=contentClasses:(public%20OR%20bokhylla)";
 				$tybring   = get_content($tittelsok);
 				$firsttry  = simplexml_load_string($tybring);
@@ -262,12 +236,12 @@ if ($antallfunnet > 0) { // kan være tom
 					}
 				}
 			} // slutt på hvis omslagnb er skrudd på
-			
-			
+
+
 		} // slutt på foreach
-		
+
 	} // slutt på sjekk om "ha med bilder"-innstilling er satt
-	
+
 } // slutt på sjekk om antallfunnet > 0
 
 
@@ -278,173 +252,91 @@ if ($antallfunnet > 0) { // kan være tom
 
 // OBS! Koha kan ikke bruke enkel, ny måte for vi har ikke unik post-ID som kan søkes opp
 
-if (stristr($_SERVER['HTTP_REFERER'] , "enkeltposturl")) { // Vi har det i referer, overstyrer den vi hadde
-	$dump = stristr ($_SERVER['HTTP_REFERER'] , "enkeltposturl="); // fra enkelposturl og ut;
-	if (stristr("&" , $dump)) { // flere vars?
+if (stristr($_SERVER['QUERY_STRING'] , "enkeltposturl")) { // Vi har det i referer, overstyrer den vi hadde
+	$dump = stristr ($_SERVER['QUERY_STRING'] , "enkeltposturl="); // fra enkelposturl og ut;
+	if (stristr($dump , "&")) { // flere vars?
 		$dump = stristr ($dump , "&", TRUE) ; // fram til FØRSTE "&"
-	} 
+	}
 	if (stristr($dump, "&")) { // & må vi rett og slett bare fjerne - kan være noen etterpå også!
 		$dump = stristr ($dump , "&" , TRUE); // fram til første &
 	}
 	$enkeltposturl = base64_decode(urldecode(str_replace ("enkeltposturl=" , "" , $dump)));
 }
 
-
-if ((isset($enkeltposturl)) && ($enkeltposturl != "")) { // det finnes en url til side hvor enkeltposter skal vises
-	foreach ($treffliste as $mangetreff => &$etttreff) { // for hvert treff i trefflista
-		$etttreff['biblioteksystem'] = $mittsystem;
-		if ($mittsystem == "koha") { // Hvis koha - pøs all treffinfo inn i URL
-			$treffinfo             = base64_encode(serialize($etttreff));
-		} else { // men hvis ikke sender vi postID, bibtype, avdelingskode
-			$enkelinfo['bibsystem'] = $mittsystem;
-			$enkelinfo['postid'] = $etttreff['identifier'];
-			$enkelinfo['bibkode'] = $minbibkode;
-			$treffinfo             = base64_encode(serialize($enkelinfo));
-		}
-
-		if(stristr($enkeltposturl , "?")) { // Har allerede query variables
-			$etttreff['permalink'] = $enkeltposturl . "&system=" . $mittsystem . "&enkeltpostinfo=" . $treffinfo;
-		} else { // Dette er den første
-			$etttreff['permalink'] = $enkeltposturl . "?system=" . $mittsystem . "&enkeltpostinfo=" . $treffinfo;
+if ($mittsystem != 'bokhylla') { // Meningsløst med enkeltpostvisning ved søk bare i Bokhylla
+	if ((isset($enkeltposturl)) && ($enkeltposturl != "")) { // det finnes en url til side hvor enkeltposter skal vises
+		if (is_array($treffliste) && count($treffliste)) {
+			foreach ($treffliste as $mangetreff => &$etttreff) { // for hvert treff i trefflista
+				$etttreff['biblioteksystem'] = $mittsystem;
+				if ($mittsystem == "koha") { // Hvis koha - pøs all treffinfo inn i URL
+					$treffinfo             = base64_encode(serialize($etttreff));
+				} else { // men hvis ikke sender vi postID, bibtype, avdelingskode
+					$enkelinfo['bibsystem'] = $mittsystem;
+					$enkelinfo['postid'] = $etttreff['identifier'];
+					$enkelinfo['bibkode'] = $minbibkode;
+					$treffinfo             = base64_encode(serialize($enkelinfo));
+				}
+	
+				if(stristr($enkeltposturl , "?")) { // Har allerede query variables
+					$etttreff['permalink'] = $enkeltposturl . "&system=" . $mittsystem . "&enkeltpostinfo=" . $treffinfo;
+				} else { // Dette er den første
+					$etttreff['permalink'] = $enkeltposturl . "?system=" . $mittsystem . "&enkeltpostinfo=" . $treffinfo;
+				}	
+	
+				$etttreff['url'] = $etttreff['permalink']; // vil gjerne bruke disse om hverandre
+			}
 		}
 	}
 }
 
-// DEBUG FØRST
-
-$iframeurl = $_SERVER['REQUEST_URI'];
-
-if ($reglitre_debug == 1) {
-	echo '<span style="color: red; font-family: tahoma;"><br>';
-	echo "Søk etter : " . $sokeord . "<br>\n";
-	echo "URL : " . $url . "<br>";
-	echo "Antall treff : " . $antallfunnet . "<br>";
-	echo "Bibliotek : " . $mittbiblioteknavn . "<br>";
-	echo "System : " . $mittsystem . "<br>";
-	echo "Omslag fra Bokkilden : ";
-	if ($omslagbokkilden == "1") {
-		echo "JA";
-	} else {
-		echo "NEI";
-	}
-	echo "<br>";
-	echo "Omslag fra NB : ";
-	if ($omslagnb == "1") {
-		echo "JA";
-	} else {
-		echo "NEI";
-	}
-	echo "<br>";
-	echo "Bestand fra Bibsys : ";
-	if ($bibsysbestand == "1") {
-		echo "JA";
-	} else {
-		echo "NEI";
-	}
-	echo "<br>";
-	echo "URL til denne iframe : " . $iframeurl . "<br>";
-	echo "</span>";
-}
-
+$results = array();
 
 if ($antallfunnet > 0) { // kan være tom
-	
-	// SKRIVE UT
 
-	$pendel       = 0;
 	$treffperside = $makstreff; // mindre forvirrende! (innstilling var før maks treff å hente, ble treff per side etter hvert)
-	
-	$viser = "<div class=\"viser_tekst\">\n";
-	
-	if ($antallfunnet >= $treffperside) {
-		$forrigelink = $_SERVER['REQUEST_URI'] . "&posisjon=" . ($posisjon - $treffperside);
-		$nestelink   = $_SERVER['REQUEST_URI'] . "&posisjon=" . ($posisjon + $treffperside);
-		
-		$forrigeposisjon = ($posisjon - $treffperside);
-		$nesteposisjon   = ($posisjon + $treffperside - 1);
-		if ($nesteposisjon > $antallfunnet) {
-			$nesteposisjon = $antallfunnet;
-		}
-		
-		$viser = "<div style=\"float: left; display: table-cell; vertical-align: bottom;\">\n";
-		$viser .= "Viser treff " . $posisjon . "-" . $nesteposisjon . " av " . $antallfunnet . " ved søk etter '" . $qsokeord . "'";
-		$viser .= "</div>\n";
-		$viser .= "<div class=\"paginering\">\n";
-		
-		// Hva skal det stå på knappen?
-		if (($nesteposisjon + $treffperside) > $antallfunnet) {
-			$antalligjen = $antallfunnet - $nesteposisjon;
-		} else {
-			$antalligjen = $treffperside;
-		}
-		
-		if ($forrigeposisjon >= 1) {
-			//		$viser .= "<input type=\"button\" onClick=\"hidereglitreframeLoading();location.href='" . $forrigelink . "'\" value='Forrige " . $treffperside . "'>\n";
-			$viser .= "<input type=\"button\" onClick=\"history.go(-1);\" value='&laquo;&nbsp;Forrige " . $treffperside . "'>\n";
-			
-		}
-		if ($nesteposisjon < $antallfunnet) {
-			$viser .= "<input type=\"button\" onClick=\"showreglitreframeLoading();location.href='" . $nestelink . "'\" value='Neste " . $antalligjen . "&nbsp;&raquo;'>\n";
-		}
-		$viser .= "</div>\n";
-	} else {
-		$viser = "<div style=\"float: left;\">\n";
-		$viser .= "Viser treff 1-" . $antallfunnet . " ved søk etter '" . $qsokeord . "'<br>";
-		$viser .= "</div>";
-	}
-
-	echo "<div id=\"divreglitreframeFrameHolder\" style=\"display:block\">";
-	echo "<div class=\"reglitre_results\">\n";
-	echo "<div class=\"reglitre_results_header\">" . $viser . "</div>";
-	
-	echo "<table>\n";
 
 	foreach ($treffliste as $enkelttreff => &$treff) {
 
-		$pendel = (1 - $pendel);
-		
-		// HER BEGYNNER REPLACE - HER STÅR DET SINGLEHTML I FØRSTE LINJE
-		
-		if (!empty($treff['omslag'])) {
-			$htmlout = @str_replace('omslagString', $treff['omslag'], $singlehtml);
-		} else {
-			$htmlout = @str_replace('omslagString', 'icons/ikke_digital.png', $singlehtml);
-		}
-		$htmlout = @str_replace('tittelString', $treff['tittelinfo'], $htmlout);
-		if ((isset($treff['utgittaar'])) && ($treff['utgittaar'] != '')) {
-			$htmlout = @str_replace('aarString', $treff['utgittaar'], $htmlout);
-		} else {
-			$htmlout = @str_replace(' (aarString)', '', $htmlout);
-		}
-		$htmlout = @str_replace('urlString', $treff['permalink'], $htmlout);
-		$htmlout = @str_replace('opphavString', $treff['opphav'], $htmlout);
-		$htmlout = @str_replace('materialtypeString', $treff['type'], $htmlout);
-		
-		if (isset($treff['fulltekst'])) {
-			$htmlout = @str_replace('onlineString', "<br><br><a target=\"_blank\" href=\"" . $treff['fulltekst'] . "\"><img src=\"icons/online.png\" alt=\"Les online!\" /></a>", $htmlout);
-			//$htmlout = @str_replace('onlineString', "<br><br><a class=\"onlinelink\" target=\"_blank\" href=\"" . $treff['fulltekst'] . "\">Online!</a><br><br>", $htmlout);
-		}
+		// Verdier for hvert treff, som skal lagres i $results og sendes videre til results.php-malen
+		$data = array(
+			'omslag' => (empty($treff['omslag']) ? 'icons/ikke_digital.png' : $treff['omslag']),
+			'tittel' => $treff['tittelinfo'],
+			'aar' => ((isset($treff['utgittaar'])) && ($treff['utgittaar'] != '') ? $treff['utgittaar'] : false),
+			'url' => $treff['permalink'],
+			'opphav' => (isset($treff['opphav']) ? $treff['opphav'] : ''),
+			'ansvarsangivelse' => (isset($treff['ansvarsangivelse']) ? $treff['ansvarsangivelse'] : ''),
+			'status' => (isset($treff['status']) ? $treff['status'] : ''),
+			'materialtype' => $treff['type'],
+			// Set empty default values to avoid 'undefined index' errors
+			'isbn' => '',
+			'dewey' => '',
+			'omfang' => '',
+			'titteloriginal' => '',
+			'fulltekst' => ((isset($treff['fulltekst']) && ($treff['fulltekst'] != '')) ? $treff['fulltekst'] : false),
+			'description' => (isset($treff['beskrivelse']) ? trunc($treff['beskrivelse'], 40) : ''),
+			);
 
 		if ((isset($treff['isbn'])) && (trim($treff['isbn']) != "")) {
 			$altmedisbn = trim($treff['isbn']);
 			if ((isset($treff['heftetbundet'])) && (trim($treff['heftetbundet']) != "")) {
 				$altmedisbn .= " (" . $treff['heftetbundet'] . ")";
 			}
-			$htmlout = @str_replace('isbnString', "<strong>ISBN: </strong>" . $altmedisbn . "<br>\n", $htmlout);
+			$data['isbn'] = "<strong>ISBN: </strong>" . $altmedisbn . "\n";
 		}
 
 		if ((isset($treff['omfang'])) && (trim($treff['omfang']) != "")) {
-			$htmlout = @str_replace('omfangString', "<strong>Omfang: </strong>" . $treff['omfang'] . "<br>\n", $htmlout);
+			$data['omfang'] = "<strong>Omfang: </strong>" . $treff['omfang'];
 		}
 
 		if ((isset($treff['originaltittel'])) && (trim($treff['originaltittel']) != "")) {
-			$htmlout = @str_replace('titteloriginalString', "<strong>Originaltittel: </strong>" . $treff['originaltittel'] . "<br>\n", $htmlout);
+			$data['titteloriginal'] = "<strong>Originaltittel: </strong>" . $treff['originaltittel'] . "\n";
 		}
 
+
 		// Bestand Bibsys...
-		// Men innstillingen må være aktivert!	
-		
-		if ($mittsystem == "bibsys") {		
+		// Men innstillingen må være aktivert!
+
+		if ($mittsystem == "bibsys") {
 			if ($bibsysbestand == 1) { 		// Hvis Bibsys-bibliotek og bestand er på
 				if ((isset($treff['bestand']) && (is_array($treff['bestand'])))) {
 					$tilgjengelig  = 0;
@@ -471,38 +363,41 @@ if ($antallfunnet > 0) { // kan være tom
 				}
 
 			$totaleks = (int)$tilgjengelig + (int)$begrenset + (int)$utlant + (int)$utilgjengelig;
-
 			$bestandhtml = "<br>\n";
 			if ($tilgjengelig > 0) {
+				$data['status'] = 'ledig';
 				$bestandhtml .= "<div class=\"tilgang_boks\">";
 				$bestandhtml .= "Ledig&nbsp;:&nbsp;" . $tilgjengelig . "<br>\n";
-				$bestandhtml .= "<img src=\"" . ilsdot("green") . "\" alt=\"Grønn dott\" />";
+				$bestandhtml .= "<div class=\"green dot\"></div>";
 				$bestandhtml .= "</div>\n";
 			} elseif (($tilgjengelig == 0) && (($begrenset + $utlant) > 0)) {
+				$data['status'] = 'utlant';
 				$bestandhtml .= "<div class=\"tilgang_boks\">";
 				$bestandhtml .= "Utlånt el.l.&nbsp;:&nbsp;" . ($begrenset + $utlant) . "<br>\n";
-				$bestandhtml .= "<img src=\"" . ilsdot("orange") . "\" alt=\"Orange dott\" />";
+				$bestandhtml .= "<div class=\"orange dot\"></div>";
 				$bestandhtml .= "</div>\n";
 			} elseif ($utilgjengelig > 0) { // utilgjengelig
+				$data['status'] = 'ikke-ledig';
 				$bestandhtml .= "<div class=\"tilgang_boks\">";
 				$bestandhtml .= "Ikke ledig&nbsp;:&nbsp;" . $utilgjengelig . "<br>\n";
-				$bestandhtml .= "<img src=\"" . ilsdot("red") . "\" alt=\"Rød dott\" />";
+				$bestandhtml .= "<div class=\"red dot\"></div>";
 				$bestandhtml .= "</div>\n";
 			} else {
+				$data['status'] = 'uklar';
 				$bestandhtml .= "<div class=\"tilgang_boks\">";
 				$bestandhtml .= "Uklar bestand!<br>\n";
-				$bestandhtml .= "<img src=\"" . ilsdot("orange") . "\" alt=\"Orange dott\" />";
+				$bestandhtml .= "<div class=\"orange dot\"></div>";
 				$bestandhtml .= "</div>\n";
-			}		
+			}
 		}
 		}
 		// BESTAND I BIBLIOFIL
-		
+
 		// Finner vi alltid i 850 - men hvis ikke er det utilgjengelig
-		
+
 		/*
 		i 850 finner vi:
-		
+
 		$a	Institution/location	Eiende bibliotek/avdeling
 		$b	Sublocation/collection	Filial- avdelings- eller samlingskode
 		$c	Shelving location	Hyllesignatur
@@ -510,9 +405,9 @@ if ($antallfunnet > 0) { // kan være tom
 		$h	Circulation status	(Not in NORMARC)
 		$x	Date of circulation status	(Not in NORMARC)
 		$y	Loan expiry date	(Not in NORMARC)
-		
+
 		*/
-		
+
 		if ($mittsystem == 'bibliofil') {
 			$tilgjengelig  = 0;
 			$utlant        = 0;
@@ -520,7 +415,7 @@ if ($antallfunnet > 0) { // kan være tom
 			$begrenset     = 0;
 			$bestandhtml   = '';
 
-	
+
 			if (is_array($treff['bestand'])) { // Bare hvis array
 				foreach ($treff['bestand'] as $enkelteks) {
 					@$status      = $enkelteks["h"];
@@ -540,7 +435,7 @@ if ($antallfunnet > 0) { // kan være tom
 							$utilgjengelig++;
 							break;
 					}
-				}	
+				}
 			}
 			$bestandhtml = "<br>\n";
 
@@ -548,79 +443,55 @@ if ($antallfunnet > 0) { // kan være tom
 
 
 			if ($tilgjengelig > 0) {
+				$data['status'] = 'ledig';
 				$bestandhtml .= "<div class=\"tilgang_boks\">";
 				$bestandhtml .= "Ledig&nbsp;:&nbsp;" . $tilgjengelig . "<br>\n";
-				$bestandhtml .= "<img src=\"" . ilsdot("green") . "\" alt=\"Grønn dott\" />";
+				$bestandhtml .= "<div class=\"green dot\"></div>";
 				$bestandhtml .= "</div>\n";
 			} elseif (($tilgjengelig == 0) && (($begrenset + $utlant) > 0)) {
+				$data['status'] = 'utlant';
 				$bestandhtml .= "<div class=\"tilgang_boks\">";
 				$bestandhtml .= "Utlånt el.l.&nbsp;:&nbsp;" . ($begrenset + $utlant) . "<br>\n";
-				$bestandhtml .= "<img src=\"" . ilsdot("orange") . "\" alt=\"Orange dott\" />";
+				$bestandhtml .= "<div class=\"orange dot\"></div>";
 				$bestandhtml .= "</div>\n";
 			} elseif ($utilgjengelig > 0) { // utilgjengelig
+				$data['status'] = 'ikke-ledig';
 				$bestandhtml .= "<div class=\"tilgang_boks\">";
 				$bestandhtml .= "Ikke ledig&nbsp;:&nbsp;" . $utilgjengelig . "<br>\n";
-				$bestandhtml .= "<img src=\"" . ilsdot("red") . "\" alt=\"Rød dott\" />";
+				$bestandhtml .= "<div class=\"red dot\"></div>";
 				$bestandhtml .= "</div>\n";
 			} else {
+				$data['status'] = 'uklar';
 				$bestandhtml .= "<div class=\"tilgang_boks\">";
 				$bestandhtml .= "Uklar bestand!<br>\n";
-				$bestandhtml .= "<img src=\"" . ilsdot("orange") . "\" alt=\"Orange dott\" />";
+				$bestandhtml .= "<div class=\"orange dot\"></div>";
 				$bestandhtml .= "</div>\n";
 			}
 		}
-		
+
 		// Så bytter vi ut hvis vi har noe
-		
+
 		if ((isset($bestandhtml)) && ($bestandhtml != '')) {
-			$htmlout = @str_replace('bestandString', $bestandhtml, $htmlout);
+			$data['bestand'] = $bestandhtml;
 		}
-		
+
 		if ((isset($treff['pdfutdrag'])) && ($treff['pdfutdrag'] != "")) {
-			$utdraghtml = '[<a target="_blank" href="' . $treff['pdfutdrag'] . '"><strong>Les utdrag</strong></a>]' . "\n";			
-			$htmlout = @str_replace('utdragString', $utdraghtml , $htmlout);
+			$utdraghtml = '[<a target="_blank" href="' . $treff['pdfutdrag'] . '"><strong>Les utdrag</strong></a>]' . "\n";
+			$data['utdrag'] = $utdraghtml;
 		} else {
-			$htmlout = @str_replace('utdragString', "" , $htmlout);
+			$data['utdrag'] = '';
 		}
-		
-		$htmlout = @str_replace('pendelString', $pendel, $htmlout);
-		$htmlout = @str_replace('descriptionString', trunc($treff['beskrivelse'], 40), $htmlout);
+
 
 		// RYDD OPP I UBRUKTE STRENGER - FJERN DEM!!
 
-		$htmlout = str_replace ("pendelString" , "" , $htmlout);
-		$htmlout = str_replace ("omslagString" , "" , $htmlout);
-		$htmlout = str_replace ("tittelString" , "" , $htmlout);
-		$htmlout = str_replace ("urlString" , "" , $htmlout);
-		$htmlout = str_replace ("aarString" , "" , $htmlout);
-		$htmlout = str_replace ("opphavString" , "" , $htmlout);
-		$htmlout = str_replace ("descriptionString" , "" , $htmlout);
-		$htmlout = str_replace ("isbnString" , "" , $htmlout);
-		$htmlout = str_replace ("omfangString" , "" , $htmlout);
-		$htmlout = str_replace ("deweyString" , "" , $htmlout);
-		$htmlout = str_replace ("materialtypeString" , "" , $htmlout);
-		$htmlout = str_replace ("onlineString" , "" , $htmlout);
-		$htmlout = str_replace ("bestandString" , "" , $htmlout);
-		$htmlout = str_replace ("titteloriginalString" , "" , $htmlout);
-
-		echo $htmlout;
-	
-	} // slutt på hvert treff
-	echo "</table>\n";
-	echo "<div class=\"reglitre_results_header\">" . $viser . "</div>";
-	echo "</div>\n"; // slutt på reglitre_results
-	
-} else { // trefflisten var tom
-	echo "<div class=\"reglitre_results\">\n";
-	echo "Ingen treff!";
-	echo "</div>";
+		$results[] = $data;
+	}
 }
-//echo "</div>\n"; // slutt på holder for spinner
+else
+{
+	// trefflisten var tom
+	$results = array();
+}
 
-
-
-
-?>
-
-</body>
-</html>
+include dirname(__FILE__).'/templates/results.php';
