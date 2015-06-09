@@ -1,5 +1,13 @@
 <?php
 
+
+// turn on for debug
+/*
+ini_set('display_startup_errors',1);
+ini_set('display_errors',1);
+error_reporting(-1);
+*/
+
 $system = (isset($treff['biblioteksystem']) ? $treff['biblioteksystem'] : '');
 
 if ($system == 'koha') {
@@ -171,13 +179,20 @@ switch ($system) {
 
                             <?php if ($system == 'tidemann' || $system == 'bibliofil'): ?>
 
-                                <?= $bestand['bibnavn'] ?>
-                                <?php if (isset($bestand['b'])): ?>
-                                    / <?= $bestand['b'] ?>
-                                <?php endif; ?>
-                                <?php if (isset($bestand['c'])): ?>
-                                    / <?= $bestand['c'] ?>
-                                <?php endif; ?>
+							<?php
+							$temp = '';
+							if ((isset($bestand['bibnavn'])) && ($bestand['bibnavn'] != '')) {
+								$temp[] = $bestand['bibnavn'];
+							}
+							if ((isset($bestand['b'])) && ($bestand['b'] != '')) {
+								$temp[] = $bestand['b'];
+							}
+							if ((isset($bestand['c'])) && ($bestand['c'] != '')) {
+								$temp[] = $bestand['c'];
+							}
+							$ferdig = implode (" / " , $temp);	
+							echo $ferdig;
+							?>
                                 <?php
                                     if ((!isset($bestand['h'])) || (!isset($bestand['f']))) { // sett til ukjent hvis ikke satt
                                         $bestand['h'] = "1";
@@ -192,23 +207,30 @@ switch ($system) {
 
                             <?php elseif ($system == 'bibsys'): ?>
 
-                                <?php if ($bestand->collection == "NB/DIG nbdigi"): ?>
-                                    Boken er tilgjengelig digitalt. Klikk p&aring; knappen "Les online" for &aring; lese den!
-                                <?php else: ?>
-                                    <?= $bestand->institution ?>
-                                    <?php if (isset($bestand->collection)): ?>
-                                        / <?= $bestand->collection ?>
-                                    <?php endif; ?>
-                                    <?php if (isset($bestand->callnumber)): ?>
-                                        / <?= $bestand->callnumber ?>
-                                    <?php endif; ?>
+                                <?php 
+								if ($bestand->collection == "NB/DIG nbdigi") {
+									echo "Boken er tilgjengelig digitalt. Klikk p&aring; knappen \"Les p&aring; nett\" for &aring; lese den!";
+								} else {
+									$temp = '';
+									if (isset($bestand->institution)) {
+										$temp[] = $bestand->institution;
+									}
+									if (isset($bestand->collection)) {
+                                    	$temp[] = $bestand->collection;
+									}
+									if (isset($bestand->callnumber)) {
+										$temp[] = $bestand->callnumber;
+									}
+									$ferdig = implode (" / " , $temp);	
+									echo $ferdig;
+								?>		
                                     : <strong><?= bestandsinfo($bestand->circulationStatus, $bestand->useRestriction) ?></strong>
                                     <?php if (($bestand->circulationStatus == "4") || ($bestand->circulationStatus == "5")): /* UTLÅNT */ ?>
                                         <?php setlocale (LC_TIME , "nb_NO"); /* norsk dato */ ?>
                                         til <?= strftime("%e. %B %G" , strtotime($bestand['y'])) ?>
                                     <?php endif; ?>
 
-                                <?php endif; ?>
+                                <?php } ?>
 
                             <?php endif; ?>
                             <br>

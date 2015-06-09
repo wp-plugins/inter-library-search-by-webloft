@@ -11,9 +11,11 @@
 
     <body onLoad="hidereglitreframeLoading();">
 
+<!-- neida, pft
         <div id="divreglitreframeLoading" style="text-align: center; margin-top: 20px;">
             <img style="border: none; box-shadow: none;" src="icons/zzz.png" alt="Laster..." />
         </div>
+-->
 
 <?php if ($reglitre_debug == 1): ?>
         <span style="color: red; font-family: tahoma;"><br>
@@ -27,6 +29,7 @@
             Bestand fra Bibsys : <?= ($bibsysbestand == "1" ? 'JA' : 'NEI' ) ?><br>
             URL til denne iframe : <?= $_SERVER['REQUEST_URI'] ?><br>
 			Hente treff fra Bokhylla : <?= ($treffbokhylla == "1" ? 'JA' : 'NEI' ) ?><br>
+			Vise lenke til avansert søk : <?= ($viseavansertlenke == "1" ? 'JA' : 'NEI' ) ?><br>
         </span>
 <?php endif; ?>
 
@@ -43,15 +46,19 @@
 			if ($dobokhylla == 1) {
 				$switchlink = str_replace ("dobokhylla=1" , "dobokhylla=0", $_SERVER['REQUEST_URI']);
 				$switchlink .= "&posisjon=1";
-				echo "<button class=\"bigfat\" onclick=\"showreglitreframeLoading();location.href='" . $switchlink . "'\">G&aring; tilbake til katalogen</button>";
+				echo "<a class=\"knapper\" href=\"#\" onclick=\"showreglitreframeLoading();location.href='" . $switchlink . "'\">G&aring; tilbake til katalogen</a>";
 			} else {
 				$switchlink = str_replace ("dobokhylla=0" , "dobokhylla=1", $_SERVER['REQUEST_URI']);
 				$switchlink .= "&posisjon=1";
-				echo "<button class=\"bigfat\" onclick=\"showreglitreframeLoading();location.href='" . $switchlink . "'\">S&oslash;k i Bokhylla i stedet!</button>";
+				echo "<a class=\"knapper\" href=\"#\" onclick=\"showreglitreframeLoading();location.href='" . $switchlink . "'\">S&oslash;k i Bokhylla i stedet!</a>";
 			}
 		}	
-		?>
+		
+		if ($viseavansertlenke == "1") { // "Vise lenke til avansert søk" satt i innstillinger?
+			echo '&nbsp;<a target="_top" class="knapper" href="' . $avanserturl . '">G&aring; til avansert s&oslash;k</a>' . "\n";
+		}
 
+		?>
                 <ul class="ils-results">
 
 <?php foreach ($results as $result): ?>
@@ -132,11 +139,29 @@
                 <div class="reglitre_results_header">
                     <?php include 'results-pager.php'; ?>
                 </div>
-            </div>
-
+		</div>
 <?php else: ?>
+        <div id="divreglitreframeFrameHolder" style="display:block;">
 
         Ingen treff!
+
+		<?php
+		if ($treffbokhylla == 1) { // Bare hvis dette er valgt i options
+			$dobokhylla = (int) $_REQUEST['dobokhylla'];
+			if ($dobokhylla == 1) {
+				$switchlink = str_replace ("dobokhylla=1" , "dobokhylla=0", $_SERVER['REQUEST_URI']);
+				$switchlink .= "&posisjon=1";
+				echo "<button class=\"bigfat\" onclick=\"showreglitreframeLoading();location.href='" . $switchlink . "'\">S&oslash;k i katalogen i stedet</button>";
+			} else {
+				$switchlink = str_replace ("dobokhylla=0" , "dobokhylla=1", $_SERVER['REQUEST_URI']);
+				$switchlink .= "&posisjon=1";
+				echo "<button class=\"bigfat\" onclick=\"showreglitreframeLoading();location.href='" . $switchlink . "'\">S&oslash;k i Bokhylla i stedet</button>";
+			}
+		}	
+		?>
+
+
+		</div>
 
 <?php endif; ?>
 

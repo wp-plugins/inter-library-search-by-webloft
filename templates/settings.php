@@ -9,6 +9,7 @@ $makstreff = get_option('wl_ils_option_makstreff' , '0');
 $bibsysbestand = get_option('wl_ils_option_bibsysbestand' , '0');
 $enkeltpost = get_option('wl_ils_option_enkeltpost' , '');
 $treffbokhylla = get_option('wl_ils_option_treffbokhylla' , '');
+$viseavansertlenke = get_option('wl_ils_option_viseavansertlenke' , '');
 
 include(dirname(__FILE__).'/../serverliste.php');
 
@@ -56,9 +57,7 @@ include(dirname(__FILE__).'/../serverliste.php');
                 <option value="50"<?php if ($makstreff == '50') { echo " selected"; } ?>>50</option>
                 <option value="100"<?php if ($makstreff == '100') { echo " selected"; } ?>>100</option>
             </select>
-        </p>
-
-        <p>
+        <br>
             <label for="wl_ils_option_enkeltpost">Side for visning av enkeltposter (la st&aring; uendret for &aring; g&aring; til biblioteksystemets egen visning): </label>
             <select name="wl_ils_option_enkeltpost">
                 <option value="">Ingen - g&aring; til biblioteksystemet</option>
@@ -92,6 +91,9 @@ if ($post_query = get_posts($args)) {
     }
 ?>
             </select>
+		<br>
+            <label for="wl_ils_option_viseavansertlenke">Vise lenke til avansert s&oslash;k? (Lar brukeren g&aring; til biblioteksystemet for &aring; gj&oslash;re mer avanserte s&oslash;k)</label>&nbsp;
+            <input name="wl_ils_option_viseavansertlenke" type="checkbox" value="1" <?php if ($viseavansertlenke == "1") { echo "checked";} ?> />
         </p>
 
         <h3>Omslagsbilder</h3>

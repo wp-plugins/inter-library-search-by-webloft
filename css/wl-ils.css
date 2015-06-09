@@ -9,7 +9,7 @@
 .ils-results-pager { font-family: muli, arial, sans-serif; color: #333; font-weight: lighter; }
 .ils-results-pager .buttons { float: right; }
 .ils-results-pager button { cursor: pointer; background: transparent; border: none; font-family: muli, arial, sans-serif; color: #000; font-weight: bold; font-size: 1em; }
-bigfat.button { width: 100%; border: 3px solid red; }
+html body div#divreglitreframeFrameHolder a.knapper { border: solid 2px #297d33; border-radius: 5px; text-transform: uppercase; text-decoration: none; font-size: 11px; color: #333; font-weight: lighter; padding: 5px; }
 
 /* Status dots */
 .dot { width: 12px; height: 12px; border-radius: 12px; display: inline-block; }
@@ -77,6 +77,9 @@ bigfat.button { width: 100%; border: 3px solid red; }
 .tabs .tab { display: none; }
 .tabs .tab.active { display: block; }
 
+form.wlils_widget {
+	white-space: nowrap;
+}
 
 @media (max-width: 500px) {
     .ils-results > li { font-size: 80%; }

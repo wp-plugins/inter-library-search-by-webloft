@@ -41,7 +41,8 @@ $omslagnb        = stripslashes(strip_tags($_REQUEST['omslagnb']));
 $hamedbilder     = stripslashes(strip_tags($_REQUEST['hamedbilder']));
 $bibsysbestand   = stripslashes(strip_tags($_REQUEST['bibsysbestand']));
 $treffbokhylla   = (int) ($_REQUEST['treffbokhylla']);
-$sokeord         = trim(stripslashes(strip_tags($_REQUEST['wl_ils_s'])));
+$viseavansertlenke = (int) ($_REQUEST['viseavansertlenke']);
+$sokeord         = trim(stripslashes(strip_tags($_REQUEST['webloftsok_query'])));
 if (isset($_REQUEST['posisjon'])) {
 	$posisjon = (int) ($_REQUEST['posisjon']);
 } else {
@@ -492,6 +493,28 @@ else
 {
 	// trefflisten var tom
 	$results = array();
+}
+
+// En siste ting: Hva er lenken til avansert søk?
+
+if ($mittsystem == 'bibsys') { 
+$avanserturl = "http://www.oria.no";
+}
+
+if ($mittsystem == 'bibliofil') { 
+$avanserturl = str_replace ("/sru" , "/websok" , $minserver) . "?pubsok_txt_0=" . $sokeord;
+}
+
+if ($mittsystem == 'tidemann') { 
+$avanserturl = str_replace ("_sru/nome.aspx" , "" , $minserver) . "/doclist.aspx?fquery=fr%3d" . $sokeord . "*+and+ba%3d001";
+}
+
+if ($mittsystem == 'koha') { 
+$avanserturl = $minserver . "/cgi-bin/koha/opac-search.pl";
+}
+
+if ($mittsystem == 'bokhylla') { 
+$avanserturl = "http://www.bokhylla.no";
 }
 
 include dirname(__FILE__).'/templates/results.php';

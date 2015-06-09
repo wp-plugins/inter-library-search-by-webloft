@@ -361,3 +361,17 @@ $litenfb = plugins_url ("icons/fb.png" , __FILE__);
 return ($litenfb);
 
 } // end function
+
+
+//***********************************************************
+function wptuts_add_color_picker( $hook ) { // color picker i settings
+//***********************************************************
+
+
+ 
+    if( is_admin() ) { 
+     
+        // Add the color picker css file       
+        wp_enqueue_style( 'wp-color-picker' ); 
+    }
+}

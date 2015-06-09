@@ -1,9 +1,9 @@
 === ILS Search by Webloft ===
 Contributors: sundaune
-Tags: bibliotek, katalog, inter library search, search, søk, søking, søkemotor, bibliotekkatalog, bibliofil, bibsys, koha, metasøk, library, bibvenn, webekspertene, webløft, webloft, e-bok, ebok, e-book, e-books
+Tags: bibliotek, katalog, inter library search, search, søk, søking, søkemotor, bibliotekkatalog, bibliofil, bibsys, koha, metasøk, library, bibvenn, webekspertene, webløft, webloft, e-bok, ebok, e-book, e-books, bibliotekarens beste venn
 Requires at least: 3.0
 Tested up to: 4.2
-Stable tag: 2.3.1
+Stable tag: 2.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -59,6 +59,12 @@ The search form will then be inserted, and search the library catalogue you have
 
 ... where CODE is taken from the table of codes available from the settings page. When the user enters a search terms and hits Enter or clicks OK, the results will appear directly beneath in an automatically expanding iframe. You can also display the search form as a widget in widgetized areas of your site (side bars, header, footer etc.). In this case you have to choose which page or post to send the results to. You do this from the widget settings - Webloft ILS will automatically scan all posts and pages, and let you choose from the ones containing the [wl-ils] shortcode.
 
+For even more hardcore control, you can specify directly in the shortcode which post/page to display your results on - just do this:
+
+[wl-ils trefflisteside=ID]
+
+... where ID is the id (doh!) of the post/page you want to display your results on.
+
 Display of single items
 
 If you do not want your users to exit your site and be taken to the library system's own pages when clicking a single hit, you can display single items on a post/page of your liking. To do this, such a post/page much exist and contain the shortcode:
@@ -101,6 +107,12 @@ Da vil et søkeskjema bli satt inn, som søker i den bibliotekkatalogen du har a
 
 ... hvor KODE er hentet fra tabellen med bibliotekkoder som er tilgjengelig fra siden med innstillinger. Når brukeren skriver inn en søketerm og trykker Enter eller klikker OK vil resultatene vises rett under, i en iframe som ekspanderer automatisk til antallet treff.
 
+Vil du være enda mer avansert kan du angi direkte i shortcode hvilken side/innlegg trefflisten skal vises på, ved å gjøre dette:
+
+[wl-ils trefflisteside=ID]
+
+... hvor ID er id-en til det innlegget eller den siden du vil vise trefflisten på. 
+
 Du kan også vise søkeskjemaet som en widget hvis nettstedet ditt har støtte for slike (på siden, på toppen, i bunnen osv.). Da må du i tilfelle angi hvilken side eller hvilket innlegg resultatene skal sendes til. Dete gjøres i widgetens innstillinger - Webloft ILS vil automatisk lete gjennom alle sider og innlegg for å la deg velge blant de som inneholder kortkoden [wl-ils].
 
 Visning av enkeltposter
@@ -134,6 +146,12 @@ NORWEGIAN:
 2. Visning av enkeltpost
 
 == Change log ==
+
+= 2.4 =
+
+* Can now send results to any premade post/page directly using shortcode argument
+* Can now pick a background color and a text color for the submit button in all widgets
+* Option to include a link to the lbrary system's advanced search screen on result page
 
 = 2.3.1 = 
 
@@ -204,6 +222,12 @@ NORWEGIAN:
 * First version
 
 NORWEGIAN:
+
+= 2.4 =
+
+* Kan nå sende trefflisten til en hvilken som helst side/innlegg ved hjelp av argument i shortcode
+* Kan nå velge bakgrunnsfarge og tekstfarge på søkeknappen i widget
+* Kan inkludere lenke til avansert søk i ditt biblioteksystem på toppen av trefflista
 
 = 2.3.1 = 
 

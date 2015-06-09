@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: ILS Search by Webloft
-Plugin URI: http://www.webekspertene.no/
+Plugin URI: http://www.bibvenn.no/
 Description: Interlibrary search for your Wordpress site! NORWEGIAN: Setter inn s&oslash;kefelt som lar deg s&oslash;ke i mange forskjellige bibliotekssystemer.
-Version: 2.3.1
-Author: H&aring;kon Sundaune / Webekspertene
-Author URI: http://www.webekspertene.no/
+Version: 2.4
+Author: H&aring;kon Sundaune / Bibliotekarens beste venn
+Author URI: http://www.bibvenn.no/
 */
 
 
@@ -13,6 +13,7 @@ Author URI: http://www.webekspertene.no/
 
 //define('ILS_URL', plugins_url(basename(__DIR__)));
 define('ILS_URL', plugins_url('' , __FILE__));
+
 
 function wl_ils_func($atts){
 
@@ -22,7 +23,8 @@ wp_enqueue_script('wl_ils-script', plugins_url( 'js/wl-ils.js', __FILE__ ), arra
 wp_enqueue_style( 'wl_ils', plugins_url( 'css/wl-ils.css', __FILE__ ), false, '1.0', 'all' );
 
 extract(shortcode_atts(array(
-	'mittbibliotek' => '0'
+	'mittbibliotek' => '0',
+	'trefflisteside' => '0'
    ), $atts));
 
 $enkeltpost = get_option('wl_ils_option_enkeltpost' , '');
@@ -32,6 +34,7 @@ $standardbibliotek = get_option('wl_ils_option_mittbibliotek' , '0');
 $omslagbokkilden = get_option('wl_ils_option_omslagbokkilden' , '0');
 $omslagnb = get_option('wl_ils_option_omslagnb' , '0');
 $treffbokhylla = get_option('wl_ils_option_treffbokhylla' , '0');
+$viseavansertlenke = get_option('wl_ils_option_viseavansertlenke' , '0');
 $hamedbilder = get_option('wl_ils_option_hamedbilder' , '1');
 $makstreff = get_option('wl_ils_option_makstreff' , '25');
 if (isset($_REQUEST['webloftsok_query'])) {
@@ -62,7 +65,7 @@ if (isset($_REQUEST['enkeltposturl'])) { // kan være satt i widget
 
 // lage URL i tilfelle det er lenket direkte til søkeside
 
-$frameurl = plugins_url('search.php' , __FILE__) . "?mittbibliotek=" . $brukbibliotek . "&omslagbokkilden=" . $omslagbokkilden . "&bibsysbestand=" . $bibsysbestand . "&omslagnb=" . $omslagnb . "&hamedbilder=" . $hamedbilder . "&makstreff=" . $makstreff . "&wl_ils_s=" . $hamedsok . "&enkeltposturl=" . $enkeltposturl . "&treffbokhylla=" . $treffbokhylla . "&dobokhylla=0";
+$frameurl = plugins_url('search.php' , __FILE__) . "?mittbibliotek=" . $brukbibliotek . "&omslagbokkilden=" . $omslagbokkilden . "&bibsysbestand=" . $bibsysbestand . "&omslagnb=" . $omslagnb . "&hamedbilder=" . $hamedbilder . "&makstreff=" . $makstreff . "&webloftsok_query=" . $hamedsok . "&enkeltposturl=" . $enkeltposturl . "&treffbokhylla=" . $treffbokhylla . "&dobokhylla=0" . "&viseavansertlenke=" . $viseavansertlenke;
 
 if ($hamedsok != '') {
 	$framekode = " src=\"" . $frameurl . "\"";
@@ -72,7 +75,6 @@ if ($hamedsok != '') {
 
 // Gjemmer iframe og viser spinner mens lasting
 //
-
 
 		ob_start();
 		require dirname(__FILE__) . '/templates/search-form.php';
@@ -135,14 +137,6 @@ function enkeltpost_func ($atts)
 }
 
 
-
-
-
-
-
-
-
-
 // 		CODE FOR WIDGET IS BELOW !!
 
 
@@ -186,6 +180,13 @@ class wl_ils_widget extends WP_Widget {
 		add_action( 'deleted_post', array( $this, 'flush_widget_cache' ) );
 		add_action( 'switch_theme', array( $this, 'flush_widget_cache' ) );
 
+	
+		// Color picker	
+		add_action( 'admin_enqueue_scripts', 'mw_enqueue_color_picker' );
+		function mw_enqueue_color_picker( ) {
+		    wp_enqueue_style( 'wp-color-picker' );
+		    wp_enqueue_script( 'my-script-handle', plugins_url('colorpicker.js', __FILE__ ), array( 'wp-color-picker' ), false, true );
+		}
 
 	} // end constructor
 
@@ -260,6 +261,8 @@ class wl_ils_widget extends WP_Widget {
 		$instance['resultatside'] = strip_tags($new_instance['resultatside']);
 		$instance['title'] = strip_tags($new_instance['title']);
 		$instance['katalog'] = strip_tags($new_instance['katalog']);
+		$instance['knappefarge'] = strip_tags($new_instance['knappefarge']);
+		$instance['knappetekstfarge'] = strip_tags($new_instance['knappetekstfarge']);
 
 		return $instance;
 
@@ -273,7 +276,7 @@ class wl_ils_widget extends WP_Widget {
 	public function form( $instance ) {
 
 		// Define default values for your variables
-		$defaults = array( 'resultatside' => '' , 'tittel' => 'Søk i katalogen' , 'katalog' => '2020000');
+		$defaults = array( 'resultatside' => '' , 'tittel' => 'Søk i katalogen' , 'katalog' => '2020000' , 'knappefarge' => 'dddddd' , 'knappetekstfarge' => '000000');
 		$instance = wp_parse_args(
 			(array) $instance, $defaults
 		);
@@ -283,6 +286,11 @@ class wl_ils_widget extends WP_Widget {
 		$resultatside = esc_attr($instance['resultatside']);
 		$title = esc_attr($instance['title']);
 		$katalog = esc_attr($instance['katalog']);
+		$knappefarge = esc_attr($instance['knappefarge']);
+		$knappetekstfarge = esc_attr($instance['knappetekstfarge']);
+		
+		$knappefarge = str_replace ("#" , "" , $knappefarge); // Fjerner #
+		$knappetekstfarge = str_replace ("#" , "" , $knappetekstfarge); // Fjerner #
 
 		// Display the admin form
 		include( plugin_dir_path(__FILE__) . 'admin.php' );
@@ -383,6 +391,7 @@ function RegisterSettings() {
     add_option("wl_ils_option_bibsysbestand", "0", "", "yes");
     add_option("wl_ils_option_enkeltpost", "", "", "yes");
     add_option("wl_ils_option_treffbokhylla", "0", "", "yes");
+    add_option("wl_ils_option_viseavansertlenke", "0", "", "yes");
 
     // Register settings that this form is allowed to update
     register_setting('wl_ils_options', 'wl_ils_option_mittbibliotek');
@@ -393,6 +402,7 @@ function RegisterSettings() {
     register_setting('wl_ils_options', 'wl_ils_option_bibsysbestand');
     register_setting('wl_ils_options', 'wl_ils_option_enkeltpost');
     register_setting('wl_ils_options', 'wl_ils_option_treffbokhylla');
+    register_setting('wl_ils_options', 'wl_ils_option_viseavansertlenke');
 }
 
 function wl_ils_settings_page() {

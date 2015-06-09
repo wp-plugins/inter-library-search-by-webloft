@@ -1,6 +1,6 @@
 <?php
 
-// Liste over bibliotek med navn, libnummer, SRU-server, biblioteksystem og avdlingskode (brukes i Bibsys SRU)
+// Liste over bibliotek med navn, libnummer, SRU-server, biblioteksystem og avdelingskode (brukes i Bibsys SRU)
 
 $bibliotek[] = "Akershus fylkesbibliotek|x|2020000|x|http://www.akershus.fylkesbibl.no/cgi-bin/sru|x|bibliofil|x|000000";
 $bibliotek[] = "Alstadhaug folkebibliotek|x|2182000|x|http://www.alstahaug.folkebibl.no/cgi-bin/sru|x|bibliofil|x|000000";
