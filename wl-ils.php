@@ -36,6 +36,7 @@ $omslagnb = get_option('wl_ils_option_omslagnb' , '0');
 $treffbokhylla = get_option('wl_ils_option_treffbokhylla' , '0');
 $viseavansertlenke = get_option('wl_ils_option_viseavansertlenke' , '0');
 $hamedbilder = get_option('wl_ils_option_hamedbilder' , '1');
+$sokesize = get_option('wl_ils_option_sokesize' , '');
 $makstreff = get_option('wl_ils_option_makstreff' , '25');
 if (isset($_REQUEST['webloftsok_query'])) {
 	$hamedsok = stripslashes(strip_tags($_REQUEST['webloftsok_query']));
@@ -65,7 +66,7 @@ if (isset($_REQUEST['enkeltposturl'])) { // kan være satt i widget
 
 // lage URL i tilfelle det er lenket direkte til søkeside
 
-$frameurl = plugins_url('search.php' , __FILE__) . "?mittbibliotek=" . $brukbibliotek . "&omslagbokkilden=" . $omslagbokkilden . "&bibsysbestand=" . $bibsysbestand . "&omslagnb=" . $omslagnb . "&hamedbilder=" . $hamedbilder . "&makstreff=" . $makstreff . "&webloftsok_query=" . $hamedsok . "&enkeltposturl=" . $enkeltposturl . "&treffbokhylla=" . $treffbokhylla . "&dobokhylla=0" . "&viseavansertlenke=" . $viseavansertlenke;
+$frameurl = plugins_url('search.php' , __FILE__) . "?mittbibliotek=" . $brukbibliotek . "&omslagbokkilden=" . $omslagbokkilden . "&bibsysbestand=" . $bibsysbestand . "&omslagnb=" . $omslagnb . "&hamedbilder=" . $hamedbilder . "&makstreff=" . $makstreff . "&webloftsok_query=" . $hamedsok . "&enkeltposturl=" . $enkeltposturl . "&treffbokhylla=" . $treffbokhylla . "&dobokhylla=0" . "&viseavansertlenke=" . $viseavansertlenke . "&sokesize=" . $sokesize;
 
 if ($hamedsok != '') {
 	$framekode = " src=\"" . $frameurl . "\"";
@@ -263,6 +264,7 @@ class wl_ils_widget extends WP_Widget {
 		$instance['katalog'] = strip_tags($new_instance['katalog']);
 		$instance['knappefarge'] = strip_tags($new_instance['knappefarge']);
 		$instance['knappetekstfarge'] = strip_tags($new_instance['knappetekstfarge']);
+	    $instance['rundkant'] = $new_instance['rundkant'];
 
 		return $instance;
 
@@ -276,7 +278,7 @@ class wl_ils_widget extends WP_Widget {
 	public function form( $instance ) {
 
 		// Define default values for your variables
-		$defaults = array( 'resultatside' => '' , 'tittel' => 'Søk i katalogen' , 'katalog' => '2020000' , 'knappefarge' => 'dddddd' , 'knappetekstfarge' => '000000');
+		$defaults = array( 'resultatside' => '' , 'tittel' => 'Søk i katalogen' , 'katalog' => '2020000' , 'knappefarge' => 'dddddd' , 'knappetekstfarge' => '000000' , 'rundkant' => '1');
 		$instance = wp_parse_args(
 			(array) $instance, $defaults
 		);
@@ -392,6 +394,7 @@ function RegisterSettings() {
     add_option("wl_ils_option_enkeltpost", "", "", "yes");
     add_option("wl_ils_option_treffbokhylla", "0", "", "yes");
     add_option("wl_ils_option_viseavansertlenke", "0", "", "yes");
+    add_option("wl_ils_option_sokesize", "", "", "yes");
 
     // Register settings that this form is allowed to update
     register_setting('wl_ils_options', 'wl_ils_option_mittbibliotek');
@@ -403,6 +406,7 @@ function RegisterSettings() {
     register_setting('wl_ils_options', 'wl_ils_option_enkeltpost');
     register_setting('wl_ils_options', 'wl_ils_option_treffbokhylla');
     register_setting('wl_ils_options', 'wl_ils_option_viseavansertlenke');
+    register_setting('wl_ils_options', 'wl_ils_option_sokesize');
 }
 
 function wl_ils_settings_page() {

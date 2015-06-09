@@ -150,7 +150,7 @@ NORWEGIAN:
 = 2.4 =
 
 * Can now send results to any premade post/page directly using shortcode argument
-* Can now pick a background color and a text color for the submit button in all widgets
+* Can now pick a background color, text color and rounded edges for the submit button in all widgets
 * Option to include a link to the lbrary system's advanced search screen on result page
 
 = 2.3.1 = 
@@ -226,7 +226,7 @@ NORWEGIAN:
 = 2.4 =
 
 * Kan nå sende trefflisten til en hvilken som helst side/innlegg ved hjelp av argument i shortcode
-* Kan nå velge bakgrunnsfarge og tekstfarge på søkeknappen i widget
+* Kan nå velge bakgrunnsfarge, tekstfarge og runde kanter på søkeknappen i widget
 * Kan inkludere lenke til avansert søk i ditt biblioteksystem på toppen av trefflista
 
 = 2.3.1 = 

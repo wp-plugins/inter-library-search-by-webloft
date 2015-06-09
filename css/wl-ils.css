@@ -1,9 +1,18 @@
 #ils_results_frame { height: 0; }
 
 /* Search form */
-.ils-search-form { font-family: muli, arial, sans-serif; font-size: 1.2em; color: #333; font-weight: 300; white-space: nowrap;}
-.ils-search-form input { font-family: muli, arial, sans-serif; font-size: 0.8em; color: black; font-weight: 400; border: none; background: #eee; border-radius: 6px; padding: 8px; margin-top: 3px; margin-bottom: 3px; }
-.ils-search-form input[type=submit] { color: black; font-family: muli, arial, sans-serif; font-size: 0.8em; font-weight: 400; padding: 6px 10px; }
+.ils-search-form- { font-family: muli, arial, sans-serif; font-size: 1.2em; color: #333; font-weight: 300; white-space: nowrap;}
+.ils-search-form- input { font-family: muli, arial, sans-serif; font-size: 0.8em; color: black; font-weight: 400; border: none; background: #eee; border-radius: 6px; padding: 8px; margin-top: 3px; margin-bottom: 3px; }
+.ils-search-form- input[type=submit] { color: black; font-family: muli, arial, sans-serif; font-size: 0.8em; font-weight: 400; padding: 6px 10px; }
+
+.ils-search-form-medium { width: 300px; font-family: muli, arial, sans-serif; font-size: 1.1em; color: #333; font-weight: 300; white-space: nowrap;}
+.ils-search-form-medium input { width: 60%; font-family: muli, arial, sans-serif; font-size: 0.8em; color: black; font-weight: 400; border: none; background: #eee; border-radius: 6px; padding: 8px; margin-top: 3px; margin-bottom: 3px; }
+.ils-search-form-medium input[type=submit] { width: 10%; min-width: 40px; color: black; font-family: muli, arial, sans-serif; font-size: 0.8em; font-weight: 400; padding: 6px 10px; }
+
+.ils-search-form-small { width: 150px; font-family: muli, arial, sans-serif; font-size: 0.9em; color: #333; font-weight: 300; white-space: nowrap;}
+.ils-search-form-small input { width: 50%; font-family: muli, arial, sans-serif; font-size: 0.8em; color: black; font-weight: 400; border: none; background: #eee; border-radius: 6px; padding: 8px; margin-top: 3px; margin-bottom: 3px; }
+.ils-search-form-small input[type=submit] { width: 15%; min-width: 40px; color: black; font-family: muli, arial, sans-serif; font-size: 0.8em; font-weight: 400; padding: 6px 10px; }
+
 
 /* Pager */
 .ils-results-pager { font-family: muli, arial, sans-serif; color: #333; font-weight: lighter; }

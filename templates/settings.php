@@ -10,6 +10,7 @@ $bibsysbestand = get_option('wl_ils_option_bibsysbestand' , '0');
 $enkeltpost = get_option('wl_ils_option_enkeltpost' , '');
 $treffbokhylla = get_option('wl_ils_option_treffbokhylla' , '');
 $viseavansertlenke = get_option('wl_ils_option_viseavansertlenke' , '');
+$sokesize = get_option('wl_ils_option_sokesize' , '98%');
 
 include(dirname(__FILE__).'/../serverliste.php');
 
@@ -92,6 +93,14 @@ if ($post_query = get_posts($args)) {
 ?>
             </select>
 		<br>
+            <label for="wl_ils_option_sokesize">Bredde p&aring; s&oslash;kefelt:</label>
+            <select name="wl_ils_option_sokesize">
+                <option value="small" <?php if ($sokesize == 'small') { echo "selected"; } ?>>Kvart</option>
+                <option value="medium" <?php if ($sokesize == 'medium') { echo "selected"; } ?>>Halv</option>
+                <option value="" <?php if ($sokesize == '') { echo "selected"; } ?>>Full (standard)</option>
+			</select>
+		<br>
+
             <label for="wl_ils_option_viseavansertlenke">Vise lenke til avansert s&oslash;k? (Lar brukeren g&aring; til biblioteksystemet for &aring; gj&oslash;re mer avanserte s&oslash;k)</label>&nbsp;
             <input name="wl_ils_option_viseavansertlenke" type="checkbox" value="1" <?php if ($viseavansertlenke == "1") { echo "checked";} ?> />
         </p>

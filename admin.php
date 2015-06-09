@@ -67,6 +67,11 @@ if ($post_query = get_posts($args)) {
 	echo '<label for="' . $this->get_field_id('knappetekstfarge') . '">Skriftfarge på søkeknapp :</label><br>';
 	echo '<input value="#' . $knappetekstfarge . '" type="text" name="' . $this->get_field_name('knappetekstfarge') . '" data-default-color="#000000" class="my-color-field" >';
 	echo "</p>";
+	echo '<br>';
+
+	echo '<label for="' . $this->get_field_id('rundkant') . '">Avrundet kant på søkeknapp</label>';
+	echo '<input class="checkbox" type="checkbox" ' . checked($instance['rundkant'], 'on') . ' id="' . $this->get_field_id('rundkant') . '" name="' . $this->get_field_name('rundkant') . '" />';
+
 }
 
 ?>

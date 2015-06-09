@@ -17,7 +17,7 @@ if ($trefflisteside > 0) {
 ?>
 
 
-<div class="ils-search-form">
+<div class="ils-search-form-<?= $sokesize ?>">
     <form<?= $spinnkode ?> id="webloftform" target="<?= $formtarget ?>" action="<?= $formaction ?>" method="GET">
         S&oslash;keord:&nbsp;
         <input type="text" value="<?= $hamedsok ?>" id="search" name="webloftsok_query" accept-charset="utf-8" />&nbsp;<input type="submit" value="S&oslash;k">
@@ -30,6 +30,7 @@ if ($trefflisteside > 0) {
         <input type="hidden" name="bibsysbestand" value="<?= $bibsysbestand ?>" />
         <input type="hidden" name="dobokhylla" value="0" />
         <input type="hidden" name="viseavansertlenke" value="<?= $viseavansertlenke ?>" />
+        <input type="hidden" name="sokesize" value="<?= $sokesize ?>" />
 
 <?php
 if (isset($sjokk[1])) { // Fantes det parametre på den trefflistesiden?
@@ -55,7 +56,7 @@ if (isset($sjokk[1])) { // Fantes det parametre på den trefflistesiden?
 </div>
 
 <div id="divreglitreFrameHolder" style="display:none;">
-    <iframe<?= $framekode ?> name="reglitre_treff_frame" onLoad="hidereglitreLoading();" id="ils_results_frame" frameborder="0" width="100%">
+    <iframe<?= $framekode ?> name="reglitre_treff_frame" onLoad="hidereglitreLoading();" id="ils_results_frame" frameborder="0" width="100%" style="padding: 0; border: 0;">
         //Nettleser st&oslash;tter ikke iframes. Kan ikke bruke katalogs&oslash;k.
     </iframe>
 </div>
