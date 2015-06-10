@@ -55,7 +55,7 @@
 		}	
 		
 		if ($viseavansertlenke == "1") { // "Vise lenke til avansert søk" satt i innstillinger?
-			echo '&nbsp;<a target="_top" class="knapper" href="' . $avanserturl . '">G&aring; til avansert s&oslash;k</a>' . "\n";
+			echo '&nbsp;<a target="_blank" class="knapper" href="' . $avanserturl . '">G&aring; til avansert s&oslash;k</a>' . "\n";
 		}
 
 		?>

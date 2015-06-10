@@ -3,7 +3,7 @@
 Plugin Name: ILS Search by Webloft
 Plugin URI: http://www.bibvenn.no/
 Description: Interlibrary search for your Wordpress site! NORWEGIAN: Setter inn s&oslash;kefelt som lar deg s&oslash;ke i mange forskjellige bibliotekssystemer.
-Version: 2.4
+Version: 2.4.1
 Author: H&aring;kon Sundaune / Bibliotekarens beste venn
 Author URI: http://www.bibvenn.no/
 */

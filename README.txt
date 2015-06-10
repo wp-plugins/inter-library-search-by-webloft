@@ -3,7 +3,7 @@ Contributors: sundaune
 Tags: bibliotek, katalog, inter library search, search, søk, søking, søkemotor, bibliotekkatalog, bibliofil, bibsys, koha, metasøk, library, bibvenn, webekspertene, webløft, webloft, e-bok, ebok, e-book, e-books, bibliotekarens beste venn
 Requires at least: 3.0
 Tested up to: 4.2
-Stable tag: 2.4
+Stable tag: 2.4.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -147,6 +147,10 @@ NORWEGIAN:
 
 == Change log ==
 
+= 2.4.1 = 
+
+* Merely cosmetics
+
 = 2.4 =
 
 * Can now send results to any premade post/page directly using shortcode argument
@@ -222,6 +226,10 @@ NORWEGIAN:
 * First version
 
 NORWEGIAN:
+
+= 2.4.1 =
+
+* Kun kosmetikk
 
 = 2.4 =
 
@@ -299,8 +307,8 @@ NORWEGIAN:
 
 == Upgrade Notice ==
 
-First official release!
+No upgrade notice
 
 NORWEGIAN:
 
-Første offisielle slipp!
+Ingen kommentar til denne versjonen
