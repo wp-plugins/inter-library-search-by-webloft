@@ -27,7 +27,10 @@ function bokhylla_sok($url, $posisjon) {
 	$omslagsserver = "http://bokforsider.webloft.no";
 
 	foreach ($xml_data->entry as $entry) {
-		// Les inn metadatafil
+		if (isset($entry->link[5])) {
+			$treff[$hitcounter]['pdflenke'] = $entry->link[5]->attributes()->href;
+		}		
+	
 		$namespaces = $entry->getNameSpaces(true);
 		$nb = $entry->children($namespaces['nb']); // alle som er nb:ditten og nb:datten
 
@@ -40,10 +43,19 @@ function bokhylla_sok($url, $posisjon) {
 		}
 		$treff[$hitcounter]['isbn'] = $isbn;
 
+		// URN
+		$urn = $nb->urn;	
+		if (stristr($urn , ";")) { // hvis det er flere inneholder strengen semikolon
+			$urn = trim(stristr($urn , ";" , TRUE)); // da tar vi det første
+		} else {
+			$urn = trim ($urn); // fint som det er. Takk.
+		}
+		$treff[$hitcounter]['urn'] = $urn;
+
 		// Omslag og lenke
 		$treff[$hitcounter]['fulltekst'] = "http://urn.nb.no/" . $nb->urn;
 		$treff[$hitcounter]['permalink'] = "http://urn.nb.no/" . $nb->urn;
-		$treff[$hitcounter]['omslag'] = $omslagsserver . "/urn/" . substr(($nb->urn), 8) . ".jpg";
+		$treff[$hitcounter]['omslag'] = $omslagsserver . "/urn/" . substr($treff[$hitcounter]['urn'], 8) . ".jpg";
 
 		$treff[$hitcounter]['tittel'] = $entry->title;
 		$treff[$hitcounter]['tittelinfo'] = $entry->title;

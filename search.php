@@ -305,6 +305,7 @@ if ($antallfunnet > 0) { // kan være tom
 			'aar' => ((isset($treff['utgittaar'])) && ($treff['utgittaar'] != '') ? $treff['utgittaar'] : false),
 			'url' => $treff['permalink'],
 			'opphav' => (isset($treff['opphav']) ? $treff['opphav'] : ''),
+			'pdflenke' => (isset($treff['pdflenke']) ? $treff['pdflenke'] : ''),
 			'ansvarsangivelse' => (isset($treff['ansvarsangivelse']) ? $treff['ansvarsangivelse'] : ''),
 			'status' => (isset($treff['status']) ? $treff['status'] : ''),
 			'materialtype' => $treff['type'],
@@ -502,7 +503,7 @@ $avanserturl = "http://www.oria.no";
 }
 
 if ($mittsystem == 'bibliofil') { 
-$avanserturl = str_replace ("/sru" , "/websok" , $minserver) . "?pubsok_txt_0=" . $sokeord;
+$avanserturl = str_replace ("/sru" , "/websok" , $minserver) . "?mode=vt&pubsok_txt_0=" . $sokeord;
 }
 
 if ($mittsystem == 'tidemann') { 

@@ -3,7 +3,7 @@
 Plugin Name: ILS Search by Webloft
 Plugin URI: http://www.bibvenn.no/
 Description: Interlibrary search for your Wordpress site! NORWEGIAN: Setter inn s&oslash;kefelt som lar deg s&oslash;ke i mange forskjellige bibliotekssystemer.
-Version: 2.4.1
+Version: 2.4.2
 Author: H&aring;kon Sundaune / Bibliotekarens beste venn
 Author URI: http://www.bibvenn.no/
 */
@@ -66,7 +66,7 @@ if (isset($_REQUEST['enkeltposturl'])) { // kan være satt i widget
 
 // lage URL i tilfelle det er lenket direkte til søkeside
 
-$frameurl = plugins_url('search.php' , __FILE__) . "?mittbibliotek=" . $brukbibliotek . "&omslagbokkilden=" . $omslagbokkilden . "&bibsysbestand=" . $bibsysbestand . "&omslagnb=" . $omslagnb . "&hamedbilder=" . $hamedbilder . "&makstreff=" . $makstreff . "&webloftsok_query=" . $hamedsok . "&enkeltposturl=" . $enkeltposturl . "&treffbokhylla=" . $treffbokhylla . "&dobokhylla=0" . "&viseavansertlenke=" . $viseavansertlenke . "&sokesize=" . $sokesize;
+@$frameurl = plugins_url('search.php' , __FILE__) . "?mittbibliotek=" . $brukbibliotek . "&omslagbokkilden=" . $omslagbokkilden . "&bibsysbestand=" . $bibsysbestand . "&omslagnb=" . $omslagnb . "&hamedbilder=" . $hamedbilder . "&makstreff=" . $makstreff . "&webloftsok_query=" . $hamedsok . "&enkeltposturl=" . $enkeltposturl . "&treffbokhylla=" . $treffbokhylla . "&dobokhylla=0" . "&viseavansertlenke=" . $viseavansertlenke . "&sokesize=" . $sokesize;
 
 if ($hamedsok != '') {
 	$framekode = " src=\"" . $frameurl . "\"";

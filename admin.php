@@ -69,8 +69,10 @@ if ($post_query = get_posts($args)) {
 	echo "</p>";
 	echo '<br>';
 
-	echo '<label for="' . $this->get_field_id('rundkant') . '">Avrundet kant på søkeknapp</label>';
-	echo '<input class="checkbox" type="checkbox" ' . checked($instance['rundkant'], 'on') . ' id="' . $this->get_field_id('rundkant') . '" name="' . $this->get_field_name('rundkant') . '" />';
+	echo '<label for="' . $this->get_field_id('rundkant') . '">Avrundet kant på søkeknapp : </label>';
+	echo '<input class="checkbox" type="checkbox" ';
+	checked ($instance['rundkant'], 'on');
+	echo ' id="' . $this->get_field_id('rundkant') . '" name="' . $this->get_field_name('rundkant') . '" />';
 
 }
 

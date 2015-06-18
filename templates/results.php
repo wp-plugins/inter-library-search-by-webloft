@@ -87,6 +87,13 @@
 								}
 								?>
                             </span>
+							<?php
+							if (isset($result['pdflenke']) && ($result['pdflenke'] != '')) {
+								echo '<br><br><a href="' . $result['pdflenke'] . '" title="Last ned som PDF!" />' . "\n";
+								echo '<img src="icons/pdf.png" alt="Last ned som PDF!" />' . "\n";	
+								echo '</a>' . "\n\n";
+							}
+							?>
                         </div>
 <?php endif; ?>
                         <h3>
