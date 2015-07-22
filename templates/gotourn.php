@@ -36,7 +36,7 @@ header('Content-type: text/html; charset=utf-8');
         <meta name="author" content="<?php echo strip_tags(stripslashes($params[4]));?>" />
         <meta property="og:type" content="book" />
         <meta property="book:author" content="<?php echo urlencode(strip_tags(stripslashes($params[4])));?>">
-        <meta property="book:isbn" content="<?php echo strip_tags(stripslashes($params[5]));?>">
+        <meta property="book:isbn" content="<?php echo trim(strip_tags(stripslashes($params[5])));?>">
         <meta property="og:description" content="<?php echo strip_tags(stripslashes($params[1]));?>">
         <meta property="og:title" content="<?php echo strip_tags(stripslashes($params[0]));?>">
         <meta property="og:image" content="<?php echo urldecode($bildeurl);?>">

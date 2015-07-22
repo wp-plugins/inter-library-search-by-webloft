@@ -239,23 +239,28 @@ $bibliotek[] = "Westerdals Høyskole|x|tx|x|http://sru.bibsys.no/search/biblioho
 
 // Koha OBS LØPENUMMER I FELT #2 FOR Å FÅ UNIK KODE
 
-$bibliotek[] = "Buskerud Fylkesbibliotek, Alt/Film|x|KOHA001|x|http://buskfylk.bibkat.no|x|koha|x|";
-$bibliotek[] = "Fotogalleriet i Oslo|x|KOHA002|x|http://fotogalleriet.bibkat.no|x|koha|x|";
-$bibliotek[] = "Husbanken|x|KOHA003|x|http://husbanken.bibkat.no|x|koha|x|";
-$bibliotek[] = "Universitetet i Stavanger, Lesesenteret|x|KOHA004|x|http://lesesenteret.bibkat.no|x|koha|x|";
-$bibliotek[] = "Westerdals Høyskole (NISS)|x|KOHA005|x|http://niss.bibkat.no|x|koha|x|";
-$bibliotek[] = "Westerdals Høyskole (NITH)|x|KOHA006|x|http://nith.bibkat.no|x|koha|x|";
-$bibliotek[] = "Sjøkrigsskolen i Bergen|x|KOHA007|x|http://sksk.bibkat.no|x|koha|x|";
-$bibliotek[] = "Solli DPS|x|KOHA008|x|http://sollidps.bibkat.no|x|koha|x|";
-$bibliotek[] = "Sonans Drammen|x|KOHA009|x|http://sonans.bibkat.no|x|koha|x|";
-$bibliotek[] = "Stiftelsen Kirkeforskning|x|KOHA010|x|http://kifo.bibkat.no|x|koha|x|";
-$bibliotek[] = "Time kommune, skolebibliotek|x|KOHA011|x|http://time-skulebibliotek.no|x|koha|x|";
+$bibliotek[] = "Buskerud Fylkesbibliotek, Alt/Film|x|KOHA001|x|http://buskfylk.bibkat.no|x|koha|x|000000";
+$bibliotek[] = "Fotogalleriet i Oslo|x|KOHA002|x|http://fotogalleriet.bibkat.no|x|koha|x|000000";
+$bibliotek[] = "Husbanken|x|KOHA003|x|http://husbanken.bibkat.no|x|koha|x|000000";
+$bibliotek[] = "Universitetet i Stavanger, Lesesenteret|x|KOHA004|x|http://lesesenteret.bibkat.no|x|koha|x|000000";
+$bibliotek[] = "Westerdals Høyskole (NISS)|x|KOHA005|x|http://niss.bibkat.no|x|koha|x|000000";
+$bibliotek[] = "Westerdals Høyskole (NITH)|x|KOHA006|x|http://nith.bibkat.no|x|koha|x|000000";
+$bibliotek[] = "Sjøkrigsskolen i Bergen|x|KOHA007|x|http://sksk.bibkat.no|x|koha|x|000000";
+$bibliotek[] = "Solli DPS|x|KOHA008|x|http://sollidps.bibkat.no|x|koha|x|000000";
+$bibliotek[] = "Sonans Drammen|x|KOHA009|x|http://sonans.bibkat.no|x|koha|x|000000";
+$bibliotek[] = "Stiftelsen Kirkeforskning|x|KOHA010|x|http://kifo.bibkat.no|x|koha|x|000000";
+$bibliotek[] = "Time kommune, skolebibliotek|x|KOHA011|x|http://time-skulebibliotek.no|x|koha|x|000000";
 
 
 // Tidemann OBS LØPENUMMER I FELT #2 FOR Å FÅ UNIK KODE
 
-$bibliotek[] = "Flesberg bibliotek|x|TIDEMANN001|x|http://asp.bibliotekservice.no/flesberg_sru/nome.aspx|x|tidemann|x|";
-$bibliotek[] = "Rødberg bibliotek|x|TIDEMANN002|x|http://asp.bibliotekservice.no/nuf_sru/nome.aspx|x|tidemann|x|";
+$bibliotek[] = "Flesberg bibliotek|x|TIDEMANN001|x|http://asp.bibliotekservice.no/flesberg_sru/nome.aspx|x|tidemann|x|000000";
+$bibliotek[] = "Rødberg bibliotek|x|TIDEMANN002|x|http://asp.bibliotekservice.no/nuf_sru/nome.aspx|x|tidemann|x|000000";
+
+// Resten av verden OBS LØPENUMMER i FELT #2 FOR Å FÅ UNIK KODE
+
+//$bibliotek[] = "COPAC britisk samsøk|x|VERDEN001|x|http://copac.ac.uk:3000/copac|x|bibliofil|x|000000";
+
 
 sort ($bibliotek);
 

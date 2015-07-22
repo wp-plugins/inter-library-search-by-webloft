@@ -149,6 +149,7 @@ NORWEGIAN:
 
 = 2.4.2 = 
 
+* Bugfix: Failed to load CSS when only widget was present in page (thank you, Nikolaj Blegvad!)
 * Bugfix: Failed to display book cover when multiple URNs encountered in Bokhylla
 
 = 2.4.1 = 
@@ -233,6 +234,7 @@ NORWEGIAN:
 
 = 2.4.2 = 
 
+* Bugfix: Stilark ble ikke lastet når bare widget var til stede på siden (takk, Nikolaj Blegvad!)
 * Bugfix: Viste ikke omslagsbilde når boka hadde flere URN i Bokhylla
 
 = 2.4.1 =

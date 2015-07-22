@@ -90,6 +90,15 @@ form.wlils_widget {
 	white-space: nowrap;
 }
 
+form.wlils_widget input#search {
+	background: pink;
+	width: 50px;
+}
+
+form.wlils_widget input[type=submit] {
+	border: 5px solid green;
+}
+
 @media (max-width: 500px) {
     .ils-results > li { font-size: 80%; }
     .ils-results > li > .status { display: block; }

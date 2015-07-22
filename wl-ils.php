@@ -20,7 +20,7 @@ function wl_ils_func($atts){
 wp_enqueue_script('wl_ils-iframe-script', plugins_url( 'js/iframeheight.js', __FILE__ ), array('jquery') );
 wp_enqueue_script('wl_ils-script', plugins_url( 'js/wl-ils.js', __FILE__ ), array('jquery') );
 
-wp_enqueue_style( 'wl_ils', plugins_url( 'css/wl-ils.css', __FILE__ ), false, '1.0', 'all' );
+wp_enqueue_style( 'wl_ils-style', plugins_url( 'css/wl-ils.css', __FILE__ ), false, '1.0', 'all' );
 
 extract(shortcode_atts(array(
 	'mittbibliotek' => '0',
@@ -357,8 +357,7 @@ class wl_ils_widget extends WP_Widget {
 	 */
 	public function register_widget_styles() {
 
-	// GJØRES ALLEREDE
-	//wp_enqueue_style( 'wl_ils', plugins_url( 'css/wl-ils.css', __FILE__ ), false, '1.0', 'all' );
+	wp_enqueue_style( 'wl_ils-style', plugins_url( 'css/wl-ils.css', __FILE__ ), false, '1.0', 'all' );
 
 	} // end register_widget_styles
 
