@@ -3,7 +3,7 @@ Contributors: sundaune
 Tags: bibliotek, katalog, inter library search, search, søk, søking, søkemotor, bibliotekkatalog, bibliofil, bibsys, koha, metasøk, library, bibvenn, webekspertene, webløft, webloft, e-bok, ebok, e-book, e-books, bibliotekarens beste venn
 Requires at least: 3.0
 Tested up to: 4.2
-Stable tag: 2.4.3
+Stable tag: 2.4.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -147,12 +147,9 @@ NORWEGIAN:
 
 == Change log ==
 
-= 2.4.3 =
-
-* Bugfix: Failed to load CSS when only widget was present in page (thank you, Nikolaj Blegvad!)
-
 = 2.4.2 = 
 
+* Bugfix: Failed to load CSS when only widget was present in page (thank you, Nikolaj Blegvad!)
 * Bugfix: Failed to display book cover when multiple URNs encountered in Bokhylla
 
 = 2.4.1 = 
@@ -235,12 +232,9 @@ NORWEGIAN:
 
 NORWEGIAN:
 
-= 2.4.3 =
-
-* Bugfix: Stilark ble ikke lastet når bare widget var til stede på siden (takk, Nikolaj Blegvad!)
-
 = 2.4.2 = 
 
+* Bugfix: Stilark ble ikke lastet når bare widget var til stede på siden (takk, Nikolaj Blegvad!)
 * Bugfix: Viste ikke omslagsbilde når boka hadde flere URN i Bokhylla
 
 = 2.4.1 =
