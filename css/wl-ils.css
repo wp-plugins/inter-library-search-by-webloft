@@ -91,12 +91,11 @@ form.wlils_widget {
 }
 
 form.wlils_widget input#search {
-	background: pink;
-	width: 50px;
+/* insert code */
 }
 
 form.wlils_widget input[type=submit] {
-	border: 5px solid green;
+/* insert code */
 }
 
 @media (max-width: 500px) {
