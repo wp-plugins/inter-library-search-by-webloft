@@ -1,7 +1,12 @@
+<script>
+jQuery(document).ready(function($){
+    jQuery('.my-color-field').wpColorPicker();
+});
+</script>
 <?php
 
 // Hent alle innlegg (og sider samtidig?)
-// Lagre id og tittel der hvor [reglitre] forekommer
+// Lagre id og tittel der hvor [wl-ils] forekommer
 
 $args = array(
 'post_type' => array('post' , 'page'),
@@ -55,6 +60,20 @@ if ($post_query = get_posts($args)) {
 	} else {
 		echo "Du må sette inn kortkoden [wl-ils] i et innlegg eller på en side først!";
 	}
+	echo "<p>";
+	echo '<label for="' . $this->get_field_id('knappefarge') . '">Bakgrunnsfarge på søkeknapp :</label><br>';
+	echo '<input value="#' . $knappefarge . '" type="text" name="' . $this->get_field_name('knappefarge') . '" data-default-color="#dddddd" class="my-color-field" >';
+	echo '<br>';
+	echo '<label for="' . $this->get_field_id('knappetekstfarge') . '">Skriftfarge på søkeknapp :</label><br>';
+	echo '<input value="#' . $knappetekstfarge . '" type="text" name="' . $this->get_field_name('knappetekstfarge') . '" data-default-color="#000000" class="my-color-field" >';
+	echo "</p>";
+	echo '<br>';
+
+	echo '<label for="' . $this->get_field_id('rundkant') . '">Avrundet kant på søkeknapp : </label>';
+	echo '<input class="checkbox" type="checkbox" ';
+	checked ($instance['rundkant'], 'on');
+	echo ' id="' . $this->get_field_id('rundkant') . '" name="' . $this->get_field_name('rundkant') . '" />';
+
 }
 
 ?>

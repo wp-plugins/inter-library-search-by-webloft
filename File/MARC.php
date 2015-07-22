@@ -39,7 +39,7 @@
  * @example   marc_yaz.php Pretty print a MARC record retrieved through the PECL yaz extension
  */
 
-require_once 'PEAR/Exception.php';
+//require_once 'PEAR/Exception.php';
 require_once 'MARCBASE.php';
 require_once 'MARC/Record.php';
 require_once 'MARC/Field.php';
